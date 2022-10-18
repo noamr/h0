@@ -84,6 +84,5 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
             itemByKey.delete(toDelete.getAttribute(keyAttribute)!);
             toDelete.remove();
         }
-
     }
 }

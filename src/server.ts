@@ -2,10 +2,8 @@ import {H0Spec, RenderFunction, RouteFunction} from "./h0";
 import {build} from "esbuild";
 import {readFileSync} from "fs";
 import { DOMParser} from "linkedom";
-import { randomUUID } from "crypto";
 import {dirname, resolve} from "path";
-import vm from "node:vm";
-import e, { Application } from "express";
+import { Application } from "express";
 
 export async function h0serve(app: Application, h0template: string) {
     const dir = dirname(h0template);

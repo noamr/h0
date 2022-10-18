@@ -4,11 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
     "esbuild": "^0.15.10",
     "express": "^4.18.2",
     "linkedom": "^0.14.17",
-    "ts-import": "^4.0.0-beta.6",
     "typescript": "^4.8.4"
   },
   "devDependencies": {
