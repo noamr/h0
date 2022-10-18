@@ -2,63 +2,33 @@ export type RouteFunction = (req: Request) => Promise<Response | null>;
 export type RenderFunction = (res: Response, root: HTMLElement) => Promise<void>;
 export type RootFunction = (doc: Document) => HTMLElement;
 export type ReduceFunction = (res: Response, prevResponse: Response | null) => Promise<Response>;
+export type Handler = (req: Request) => boolean;
 interface H0Options {
-    serviceWorker: boolean;
-    ssr: boolean;
+    firstPass: "server" | "client" | "manual"
+    updates: "server" | "client" | "worker" | "none"
 }
-
-interface Differ {
-    diff(callback: ((model: {[key: string]: any}) => ((root: HTMLElement) => void))): void;
-    list(callback: (model: {[key: string]: any}) => void, view: () => ({
-        list: HTMLElement;
-        itemTemplate: HTMLTemplateElement;
-        renderItem: (model: any, element: HTMLElement) => void;
-    })): void;
-}
-
-interface Model {[key: string]: any};
 
 export interface H0Spec {
     router: string;
     renderer: string;
     rootSelector: string;
     scope: string;
-    options?: H0Options;
+    options: H0Options;
 }
 
-export async function initClient({router, renderer, rootSelector, scope, options}: H0Spec, window: Window) {
-    const {document} = window;
-    let previousResponse : Response | null = null;
-    const rootElement = document.querySelector(rootSelector) as HTMLElement;
+let waitForServer: Promise<any> = Promise.resolve();
 
-    if (!rootElement)
-        throw new Error(`Element ${rootSelector} not found`);
+export function initServiceWorker({scope, router}: H0Spec) {
+    const swURL = new URL(scope, location.href);
+    swURL.searchParams.set("h0-view", location.href);
+    swURL.searchParams.set("h0-router", router);
+    waitForServer = (async () => {
+        const reg = await navigator.serviceWorker.register(swURL.href, {scope, type: "module"})
+        await reg.active;
+    })();
+}
 
-    const rendererPromise = import(renderer);
-    let waitForServer: Promise<any> = Promise.resolve();
-    if (options?.serviceWorker) {
-        const swURL = new URL(scope, location.href);
-        swURL.searchParams.set("h0-view", location.href);
-        swURL.searchParams.set("h0-router", router);
-        waitForServer = navigator.serviceWorker.register(swURL.href, {scope, type: "module"}).then(reg => reg.active);
-    }
-
-    function handle(req: Request): boolean {
-        const {pathname} = new URL(req.url);
-        if (!pathname.startsWith(scope))
-            return false;
-
-        (async() => {
-            await waitForServer;
-            let response = await fetch(req);
-            if (!response)
-                location.href = req.url;
-            (await rendererPromise).render(response, rootElement);
-        })();
-
-        return true;
-    }
-
+export function captureEvents(rootElement: HTMLElement, handle: Handler) {
     rootElement.addEventListener("submit", (event: SubmitEvent) => {
         const form = event.target as HTMLFormElement;
         let body : FormData | null = new FormData(form);
@@ -84,6 +54,41 @@ export async function initClient({router, renderer, rootSelector, scope, options
         if (!handle(new Request(href)))
             event.preventDefault();
     }, {capture: true});
+}
 
-    handle(new Request(location.pathname.startsWith(scope) ? location.pathname : scope));
+export function createHandler({renderer, scope, router, options}: H0Spec, rootElement: Element) {
+    const rendererPromise = import(renderer);
+
+    return (req: Request) => {
+        const {pathname} = new URL(req.url);
+        if (!pathname.startsWith(scope))
+            return false;
+
+        (async() => {
+            await waitForServer;
+            const response = await ((options.updates === "client" ? (await import(router)) : fetch)(req));
+            if (!response)
+                location.href = req.url;
+            (await rendererPromise).render(response, rootElement);
+        })();
+
+        return true;
+    }
+}
+
+export async function clientPass({scope}: H0Spec, handle: Handler, {location}: Window) {
+    handle(new Request(location.pathname.startsWith(scope) ? location.href : scope));
+}
+
+export function initClient(spec: H0Spec, {document, location}: Window) {
+    const rootElement = document.querySelector(spec.rootSelector) as HTMLElement;
+    if (!rootElement)
+        throw new Error(`Root element ${spec.rootSelector} not found`);
+
+    if (spec.options.updates !== "none") {
+        const handler = createHandler(spec, rootElement!);
+        captureEvents(rootElement, handler);
+        clientPass(spec, handler, window);
+    }
+
 }

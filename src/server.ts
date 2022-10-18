@@ -74,7 +74,7 @@ export async function h0serve(app: Application, h0template: string) {
                 res.setHeader(h, v);
             if (mode === "navigate") {
                 res.setHeader("Content-Type", "text/html");
-                if (options?.ssr) {
+                if (options?.firstPass === "server") {
                     const document = new DOMParser().parseFromString(documentMaster.toString(), "text/html")!;
                     console.log(documentMaster.toString(), rootSelector)
                     const rootElement = document.querySelector(rootSelector) || document.documentElement;

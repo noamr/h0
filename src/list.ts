@@ -8,11 +8,10 @@ interface ListUpdaterParams<V, ItemElement extends Element = Element, ListElemen
     createItem?: HTMLTemplateElement | CreateItemFunc<ItemElement>;
     itemTagName?: string;
     updateItem: UpdateItemFunc<V, ItemElement>;
-    viewSelector: string | ((root: HTMLElement) => ListElement);
 }
 
 export function createListUpdater<V, ItemElement extends Element = Element, ListElement extends Element = Element>(params: ListUpdaterParams<V, ItemElement, ListElement>) {
-    let {createItem, itemTagName, modelSchema, updateItem, keyAttribute, viewSelector} = params;
+    let {createItem, itemTagName, modelSchema, updateItem, keyAttribute} = params;
 
     if (!createItem) {
         if (itemTagName)
@@ -20,11 +19,6 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
         else
             throw new TypeError("createItem or itemTagName required");
     }
-
-    if (typeof viewSelector === "string") {
-        const selector = viewSelector as string;
-        viewSelector = (root: HTMLElement) => root.querySelector(selector)!;
-    };
 
     if ("tagName" in createItem && (createItem as Element).tagName === "TEMPLATE")
         createItem = () => (createItem as HTMLTemplateElement).content.firstElementChild?.cloneNode(true) as ItemElement;
@@ -50,9 +44,7 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
 
     const accounting = new WeakMap<ListElement, Map<string, ItemElement>>();
 
-    return (root: HTMLElement, model: IterableIterator<V>) => {
-        const view = (viewSelector as (root: HTMLElement) => ListElement)(root);
-
+    return (view: ListElement, model: IterableIterator<V>) => {
         const itemByKey = accounting.get(view) || new Map<string, ItemElement>();
         accounting.set(view, itemByKey);
         let lastElement: Element | null = null;
@@ -67,7 +59,7 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
                 element = view.querySelector(`${itemTagName || "*"}[${keyAttribute}="${key}"]`);
 
                 if (!element) {
-                    element = (createItem as CreateItemFunc<ItemElement>)(root.ownerDocument);
+                    element = (createItem as CreateItemFunc<ItemElement>)(view.ownerDocument);
                     element.setAttribute(keyAttribute, key);
                     view.append(element);
                 }

@@ -8,7 +8,6 @@ interface Model {
 }
 
 const updateSymbolList = createListUpdater<Model["symbols"][keyof Model["symbols"]], HTMLOptionElement, HTMLSelectElement>({
-    viewSelector: "select#symbols",
     keyAttribute: "value",
     modelSchema: "object",
     itemTagName: "option",
@@ -16,7 +15,6 @@ const updateSymbolList = createListUpdater<Model["symbols"][keyof Model["symbols
 });
 
 const updateRateList = createListUpdater<Model["rates"][keyof Model["rates"]], HTMLOptionElement, HTMLSelectElement>({
-    viewSelector: "select#rates",
     keyAttribute: "value",
     modelSchema: "object",
     itemTagName: "option",
@@ -25,9 +23,8 @@ const updateRateList = createListUpdater<Model["rates"][keyof Model["rates"]], H
 
 export async function render(response: Response, root: HTMLElement) {
     const {from, to, symbols, rates} = await response.json();
-    console.log(root.outerHTML)
     root.querySelector("#from")!.innerHTML = from;
     root.querySelector("#to")!.innerHTML = to;
-    updateSymbolList(root, symbols);
-    updateRateList(root, rates);
+    updateSymbolList(root.querySelector("select#symbols") as HTMLSelectElement, symbols);
+    updateRateList(root.querySelector("select#rates") as HTMLSelectElement, rates);
 }
