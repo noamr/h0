@@ -2,15 +2,16 @@ const listAcounting = new WeakMap<Element, Map<string, Element>>();
 type UpdateItemFunc<V, ItemElement extends Element = Element> = (element: ItemElement, value: V, key: string) => void;
 type CreateItemFunc<ItemElement extends Element = Element> = (document: Document) => ItemElement;
 
-interface ListUpdaterParams<V, ItemElement extends Element = Element, ListElement extends Element = Element> {
-    modelSchema?: "object" | "array" | "entries" | ((v : V, i: number) => string) | ((e: [string, V], i: number) => string);
+type ModelSchema<V> = "object" | "array" | "entries" | ((v : V, i: number) => string) | ((e: [string, V], i: number) => string);
+interface ListUpdaterParams<V, ItemElement extends Element = Element, ListElement extends Element = Element, Schema extends ModelSchema<V> = any> {
+    modelSchema?: Schema;
     keyAttribute: string;
     createItem?: HTMLTemplateElement | CreateItemFunc<ItemElement>;
     itemTagName?: string;
     updateItem: UpdateItemFunc<V, ItemElement>;
 }
 
-export function createListUpdater<V, ItemElement extends Element = Element, ListElement extends Element = Element>(params: ListUpdaterParams<V, ItemElement, ListElement>) {
+export function createListUpdater<V, ItemElement extends Element = Element, ListElement extends Element = Element, Schema extends ModelSchema<V> = any>(params: ListUpdaterParams<V, ItemElement, ListElement, ModelSchema<V>>) {
     let {createItem, itemTagName, modelSchema, updateItem, keyAttribute} = params;
 
     if (!createItem) {
@@ -43,13 +44,17 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
         throw new TypeError("Invalid createItem");
 
     const accounting = new WeakMap<ListElement, Map<string, ItemElement>>();
+    type ModelType = "array" extends Schema ? V[] :
+                     "object" extends Schema ? {[key: string]: V} :
+                     "entries" extends Schema ? Array<[string, V]> :
+                     V;
 
-    return (view: ListElement, model: IterableIterator<V>) => {
+    return (view: ListElement, model: ModelType) => {
         const itemByKey = accounting.get(view) || new Map<string, ItemElement>();
         accounting.set(view, itemByKey);
         let lastElement: Element | null = null;
-        for (const v of transformModel(model)) {
-            const key = (keyGetter as (v: V) => string)(v);
+        transformModel(model).forEach((v: V, i: number) => {
+            const key = (keyGetter as (v: V, i: number) => string)(v, i);
             const value = (valueGetter as (v: V ) => V)(v);
             let element: ItemElement | null = lastElement?.nextElementSibling as ItemElement;
             if (!element || element.getAttribute(keyAttribute) !== key)
@@ -76,7 +81,7 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
 
             updateItem(element, value, key);
             lastElement = element;
-        }
+        });
 
         const first = () => lastElement ? lastElement.nextElementSibling : view.firstElementChild;
 
