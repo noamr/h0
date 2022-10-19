@@ -10,9 +10,10 @@ interface H0Options {
 
 type HistoryMode = "push" | "replace" | "transparent";
 
-interface H0Navigator {
+export interface H0Navigator {
     navigate(href: string, historyMode: HistoryMode): void;
     reload(): void;
+    submit(form: HTMLFormElement): void;
 }
 
 export interface H0Spec {
@@ -35,22 +36,27 @@ function initServiceWorker({scope}: H0Spec, index: string) {
     })();
 }
 
+function submit(form: HTMLFormElement, handle: Handler, submitter?: HTMLElement | null) {
+    let body : FormData | null = new FormData(form);
+    const method = (submitter?.getAttribute("formmethod") || form.method || "GET").toUpperCase();
+    const isGet = method === "GET";
+    let action = form.action;
+    if (isGet) {
+        const url = new URL(action);
+        for (const [k, v] of body)
+            url.searchParams.append(k, v.toString());
+        action = url.href;
+        body = null;
+    }
+
+    const request = new Request(action, {body, method});
+    return handle(request, action === location.href ? "replace" : "push");
+}
+
 function captureEvents(rootElement: HTMLElement, handle: Handler) {
     rootElement.addEventListener("submit", (event: SubmitEvent) => {
         const form = event.target as HTMLFormElement;
-        let body : FormData | null = new FormData(form);
-        const isGet = form.method.toUpperCase() === "GET";
-        let action = form.action;
-        if (isGet) {
-            const url = new URL(action);
-            for (const [k, v] of body)
-                url.searchParams.append(k, v.toString());
-            action = url.href;
-            body = null;
-        }
-
-        const request = new Request(action, {body, method: form.method.toUpperCase()});
-        if (!handle(request, "push"))
+        if (submit(form, handle, event.submitter))
             event.preventDefault();
     }, {capture: true});
 
@@ -58,7 +64,7 @@ function captureEvents(rootElement: HTMLElement, handle: Handler) {
         if (!(event.target instanceof HTMLAnchorElement))
             return;
         const {href} = event.target as HTMLAnchorElement;
-        if (!handle(new Request(href), "push"))
+        if (handle(new Request(href), "push"))
             event.preventDefault();
     }, {capture: true});
 }
@@ -97,7 +103,8 @@ export function initClient(spec: H0Spec, window: Window) {
     captureEvents(rootElement, handler);
     const h0 = {
         navigate: (href: string, historyMode: HistoryMode) => handler(new Request(href), historyMode),
-        reload: () => handler(new Request(spec.scope), "transparent")
+        reload: () => handler(new Request(spec.scope), "transparent"),
+        submit: (form: HTMLFormElement, submitter?: HTMLElement) => submit(form, handler, submitter)
     };
     if (spec.mount)
         spec.mount(rootElement, {window, h0});

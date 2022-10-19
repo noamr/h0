@@ -1,5 +1,5 @@
 import {H0Spec} from "./h0";
-import {build, transform} from "esbuild";
+import {build} from "esbuild";
 import {readFileSync} from "fs";
 import { DOMParser} from "linkedom";
 import {dirname, resolve} from "path";
