@@ -1,34 +1,40 @@
 export type RouteFunction = (req: Request) => Promise<Response | null>;
 export type RenderFunction = (res: Response, root: HTMLElement) => Promise<void>;
 export type RootFunction = (doc: Document) => HTMLElement;
-export type ReduceFunction = (res: Response, prevResponse: Response | null) => Promise<Response>;
-export type Handler = (req: Request) => boolean;
+export type MountFunction = (root: HTMLElement, params: {window: Window, h0: H0Navigator}) => void;
+export type Handler = (req: Request, historyMode: HistoryMode) => boolean;
 interface H0Options {
     firstPass: "server" | "client" | "manual"
     updates: "server" | "client" | "worker" | "none"
 }
 
+type HistoryMode = "push" | "replace" | "transparent";
+
+interface H0Navigator {
+    navigate(href: string, historyMode: HistoryMode): void;
+}
+
 export interface H0Spec {
-    router: string;
-    renderer: string;
-    rootSelector: string;
+    route: RouteFunction;
+    render: RenderFunction;
+    mount?: MountFunction;
+    selectRoot: (root: Document) => HTMLElement;
     scope: string;
     options: H0Options;
 }
 
 let waitForServer: Promise<any> = Promise.resolve();
 
-export function initServiceWorker({scope, router}: H0Spec) {
+function initServiceWorker({scope}: H0Spec, index: string) {
     const swURL = new URL(scope, location.href);
-    swURL.searchParams.set("h0-view", location.href);
-    swURL.searchParams.set("h0-router", router);
+    swURL.searchParams.set("h0-spec", index);
     waitForServer = (async () => {
         const reg = await navigator.serviceWorker.register(swURL.href, {scope, type: "module"})
         await reg.active;
     })();
 }
 
-export function captureEvents(rootElement: HTMLElement, handle: Handler) {
+function captureEvents(rootElement: HTMLElement, handle: Handler) {
     rootElement.addEventListener("submit", (event: SubmitEvent) => {
         const form = event.target as HTMLFormElement;
         let body : FormData | null = new FormData(form);
@@ -43,7 +49,7 @@ export function captureEvents(rootElement: HTMLElement, handle: Handler) {
         }
 
         const request = new Request({url: action, method: form.method} as RequestInfo, {body});
-        if (!handle(request))
+        if (!handle(request, "push"))
             event.preventDefault();
     }, {capture: true});
 
@@ -51,44 +57,48 @@ export function captureEvents(rootElement: HTMLElement, handle: Handler) {
         if (!(event.target instanceof HTMLAnchorElement))
             return;
         const {href} = event.target as HTMLAnchorElement;
-        if (!handle(new Request(href)))
+        if (!handle(new Request(href), "push"))
             event.preventDefault();
     }, {capture: true});
 }
 
-export function createHandler({renderer, scope, router, options}: H0Spec, rootElement: Element) {
-    const rendererPromise = import(renderer);
-
-    return (req: Request) => {
+function createHandler({render, scope, route, selectRoot, options}: H0Spec) {
+    return (req: Request, historyMode: HistoryMode) => {
         const {pathname} = new URL(req.url);
         if (!pathname.startsWith(scope))
             return false;
 
+        const rootElement = selectRoot(document);
+
         (async() => {
             await waitForServer;
-            const response = await ((options.updates === "client" ? (await import(router)) : fetch)(req));
+            const response = await ((options.updates === "client" ? route : fetch)(req));
             if (!response)
                 location.href = req.url;
-            (await rendererPromise).render(response, rootElement);
+            else
+                render(response, rootElement);
         })();
 
         return true;
     }
 }
 
-export async function clientPass({scope}: H0Spec, handle: Handler, {location}: Window) {
-    handle(new Request(location.pathname.startsWith(scope) ? location.href : scope));
+async function clientPass({scope}: H0Spec, handle: Handler, {location}: Window) {
+    handle(new Request(location.pathname.startsWith(scope) ? location.href : scope), "replace");
 }
 
-export function initClient(spec: H0Spec, {document, location}: Window) {
-    const rootElement = document.querySelector(spec.rootSelector) as HTMLElement;
+export function initClient(spec: H0Spec, window: Window) {
+    const rootElement = spec.selectRoot(window.document);
     if (!rootElement)
-        throw new Error(`Root element ${spec.rootSelector} not found`);
+        throw new Error(`Root element not found`);
 
-    if (spec.options.updates !== "none") {
-        const handler = createHandler(spec, rootElement!);
-        captureEvents(rootElement, handler);
-        clientPass(spec, handler, window);
-    }
-
+    const handler = createHandler(spec!);
+    captureEvents(rootElement, handler);
+    const h0 = {navigate: (href: string, historyMode: HistoryMode) => {
+        handler(new Request(href), historyMode);
+    }};
+    if (spec.mount)
+        spec.mount(rootElement, {window, h0});
+    clientPass(spec, handler, window);
+    return h0;
 }
