@@ -12,6 +12,7 @@ type HistoryMode = "push" | "replace" | "transparent";
 
 interface H0Navigator {
     navigate(href: string, historyMode: HistoryMode): void;
+    reload(): void;
 }
 
 export interface H0Spec {
@@ -48,7 +49,7 @@ function captureEvents(rootElement: HTMLElement, handle: Handler) {
             body = null;
         }
 
-        const request = new Request({url: action, method: form.method} as RequestInfo, {body});
+        const request = new Request(action, {body, method: form.method.toUpperCase()});
         if (!handle(request, "push"))
             event.preventDefault();
     }, {capture: true});
@@ -94,9 +95,10 @@ export function initClient(spec: H0Spec, window: Window) {
 
     const handler = createHandler(spec!);
     captureEvents(rootElement, handler);
-    const h0 = {navigate: (href: string, historyMode: HistoryMode) => {
-        handler(new Request(href), historyMode);
-    }};
+    const h0 = {
+        navigate: (href: string, historyMode: HistoryMode) => handler(new Request(href), historyMode),
+        reload: () => handler(new Request(spec.scope), "transparent")
+    };
     if (spec.mount)
         spec.mount(rootElement, {window, h0});
     clientPass(spec, handler, window);

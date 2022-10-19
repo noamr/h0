@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>H0 • TodoMVC</title>
+		<link rel="stylesheet" href="/node_modules/todomvc-common/base.css">
+		<link rel="stylesheet" href="/node_modules/todomvc-app-css/index.css">
+		<!-- CSS overrides - remove if you don't need it -->
+		<link rel="stylesheet" href="style.css">
+        <link rel="h0" href="todos.h0.ts">
+        <script src="/dist/h0-standalone.js" h0-runtime="standalone"></script>
+	</head>
+	<body>
+		<section class="todoapp">
+			<header class="header">
+				<h1>todos</h1>
+				<form name="newTask" method="POST" action="/todos">
+					<input name="title" type="text" placeholder="What needs to be done?" autofocus>
+				</form>
+			</header>
+
+			<main>
+				<form id="main" action="/todos"></form>
+				<input name="toggleAll" type="checkbox" form="main" />
+
+				<ul class="todo-list">
+					<template class="item-template">
+						<form class="task" method="PUT" action="/todos">
+							<li>
+                                <input name="id" type="hidden">
+								<input name="completed" type="checkbox" checked>
+								<input name="title" readonly />
+								<input type="submit" hidden name="save" />
+								<button name="destroy">X</button>
+							</li>
+						</form>
+					</template>
+				</ul>
+			</main>
+
+			<footer>
+				<output id="activeCount">0</output>
+				<nav>
+					<a name="/" href="#/">All</a>
+					<a name="/active" href="#/active">Active</a>
+					<a name="/completed" href="#/completed">Completed</a>
+				</nav>
+				<input form="main" type="button" name="clearCompleted" value="Clear completed" />
+			</footer>
+		</section>
+		<footer class="info">
+			<p>Double-click to edit a todo</p>
+			<p>Created by <a href="https://twitter.com/nomsternom">Noam Rosenthal</a></p>
+			<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+		</footer>
+
+		<script src="/node_modules/todomvc-common/base.js"></script>
+	</body>
+</html>

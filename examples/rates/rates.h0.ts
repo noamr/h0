@@ -1,4 +1,4 @@
-import {createListUpdater} from "../src/list";
+import {createListUpdater} from "../../src/list";
 
 interface Model {
     to: string;

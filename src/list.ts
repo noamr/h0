@@ -21,8 +21,10 @@ export function createListUpdater<V, ItemElement extends Element = Element, List
             throw new TypeError("createItem or itemTagName required");
     }
 
-    if ("tagName" in createItem && (createItem as Element).tagName === "TEMPLATE")
-        createItem = () => (createItem as HTMLTemplateElement).content.firstElementChild?.cloneNode(true) as ItemElement;
+    if ("tagName" in createItem && (createItem as Element).tagName === "TEMPLATE") {
+        const template = createItem;
+        createItem = () => (template as HTMLTemplateElement).content.firstElementChild?.cloneNode(true) as ItemElement;
+    }
 
     let transformModel = (a: any) => a;
     let keyGetter = modelSchema;

@@ -6,7 +6,7 @@ const esbuild = require("esbuild");
 require("@babel/register")({extensions: ['.js', '.ts']});
 
 const {h0serve} = require("./src/server.ts");
-h0serve(app, "./examples/kitchen-sink.html");
+h0serve(app, "./examples/rates/rates.html");
 
 app.use(async (req, res, next) => {
     if (req.query["h0"] !== "bundle") {
@@ -20,6 +20,7 @@ app.use(async (req, res, next) => {
     res.send(text);
 });
 app.use(express.static("."));
+
 app.listen(3000, () => {
     console.log("App running");
 })

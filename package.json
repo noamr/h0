@@ -20,6 +20,8 @@
     "jest": "^29.2.0",
     "nodemon": "^2.0.20",
     "playwright": "^1.27.1",
+    "todomvc-app-css": "^2.4.2",
+    "todomvc-common": "^1.0.5",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1"
   },
