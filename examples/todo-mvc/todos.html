@@ -15,24 +15,26 @@
 		<section class="todoapp">
 			<header class="header">
 				<h1>todos</h1>
-				<form name="newTask" method="POST" action="/todos">
+				<form name="newTask" method="POST" action="/todos/add">
 					<input name="title" type="text" placeholder="What needs to be done?" autofocus>
 				</form>
 			</header>
 
 			<main>
-				<form id="main" action="/todos"></form>
-				<input name="toggleAll" type="checkbox" form="main" />
+                <form method="POST" action="/todos/toggle">
+                    <input name="completed" type="checkbox" id="toggleAll" />
+                    <input name="submit" type="hidden" value="toggle" hidden>
+                </form>
 
 				<ul class="todo-list">
 					<template class="item-template">
-						<form class="task" method="PUT" action="/todos">
+						<form class="task" action="/todos/edit" method="POST">
 							<li>
                                 <input name="id" type="hidden">
 								<input name="completed" type="checkbox" checked>
 								<input name="title" readonly />
-								<input type="submit" hidden name="save" formmethod="put" />
-								<button name="destroy" formmethod="delete">X</button>
+								<input type="submit" hidden />
+								<button name="destroy" formaction="/todos/delete">X</button>
 							</li>
 						</form>
 					</template>
@@ -40,13 +42,15 @@
 			</main>
 
 			<footer>
-				<output id="activeCount">0</output>
+				<output id="activeCount"></output>
 				<nav>
 					<a name="/" href="#/">All</a>
 					<a name="/active" href="#/active">Active</a>
 					<a name="/completed" href="#/completed">Completed</a>
 				</nav>
-				<input form="main" type="button" name="clearCompleted" value="Clear completed" />
+                <form action="/todos/purge" method="POST">
+                    <input type="submit" name="clearCompleted" value="Clear completed" />
+                </form>
 			</footer>
 		</section>
 		<footer class="info">

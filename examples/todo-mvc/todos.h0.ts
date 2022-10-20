@@ -11,11 +11,11 @@ interface Model {
     tasks: Task[]
 }
 
-const updateTaskList = createListUpdater<Task, HTMLFormElement, HTMLUListElement>({
+const updateTaskList = createListUpdater<Task>({
     keyAttribute: "data-id",
     itemTagName: "li",
     modelSchema: (v: Task) => v.id,
-    updateItem: (element: HTMLFormElement, task: Task) => {
+    updateItem: (element: Element, task: Task) => {
         if (task.completed)
             element.querySelector('input[name="completed"]')!.setAttribute("checked", "checked");
         else
@@ -27,56 +27,66 @@ const updateTaskList = createListUpdater<Task, HTMLFormElement, HTMLUListElement
     createItem: document.querySelector(".item-template") as HTMLTemplateElement
 })
 
-export async function render(response: Response, root: HTMLElement) {
+export async function render(response: Response, root: Element) {
     const {tasks} = (await response.json()) as Model;
     const active = tasks.filter(t => !t.completed);
     const completed = tasks.filter(t => t.completed);
-    root.querySelector("#activeCount")!.innerHTML = "" + active.length;
-    console.log(location.hash);
-    const list = root.querySelector(".todo-list") as HTMLUListElement;
+    root.querySelector("#activeCount")!.innerHTML = `${active.length} task${active.length === 1 ? "" : "s"} remaining`;
+    const list = root.querySelector(".todo-list")!;
     updateTaskList(list, location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks);
+    root.setAttribute("has-completed", completed.length ? "true" : "false");
+    root.setAttribute("has-tasks", tasks.length ? "true" : "false");
 }
 
 export async function route(request: Request) : Promise<Response> {
     const fromStorage = (typeof localStorage === "undefined") ? [] : JSON.parse(localStorage.getItem("todos") || "[]");
     const tasks = new Map<string, Task>(fromStorage);
     const save = () => localStorage.setItem("todos", JSON.stringify(Array.from(tasks.entries())));
+    const url = new URL(request.url);
 
     switch (request.method) {
         case "POST": {
-            const id = crypto.randomUUID();
-            const data = await request.formData();
-            const title = data.get("title");
-            if (title)
-                tasks.set(id, {id, title: title as string, completed: false});
-            debugger;
+            switch (url.pathname) {
+                case "/todos/toggle":
+                    const completed = !!(await request.formData()).get("completed");
+                    for (const [k, v] of tasks.entries())
+                        v.completed = completed;
+                    break;
+                case "/todos/purge":
+                    for (const [k, v] of tasks.entries())
+                        if (v.completed)
+                            tasks.delete(k);
+                    break;
+                case "/todos/add": {
+                    const title = (await request.formData()).get("title");
+                    const id = crypto.randomUUID();
+                    if (title)
+                        tasks.set(id, {id, title: title as string, completed: false});
+                    break;
+                }
+                case "/todos/edit": {
+                    const d = await request.formData();
+                    const title = d.get("title");
+                    const id = d.get("id") as string;
+                    const completed = d.get("completed");
+                    if (title)
+                        tasks.set(id, {id, title: title as string, completed: !!completed});
+                    break;
+                }
+                case "/todos/delete": {
+                    const d = await request.formData();
+                    const id = d.get("id") as string;
+                    tasks.delete(id);
+                }
+
+            }
             save();
-            break;
+            return Response.redirect("/todos");
         }
 
-        case "PUT": {
-            const data = await request.formData();
-            const id = data.get("id") as string;
-            const title = data.get("title");
-            if (title) {
-                const task: Task = {id, title: title as string, completed: !!data.get("completed")};
-                tasks.set(id, task);
-            } else
-                tasks.delete(id);
-
-            save();
-            break;
+        default:
+            return new Response(JSON.stringify({tasks: Array.from(tasks.values())}), {headers: {"Content-Type": "application/json"}});
         }
-
-        case "DELETE": {
-            const data = await request.formData();
-            const id = data.get("id") as string;
-            tasks.delete(id);
-            save();
-            break;
-        }
-    }
-    return new Response(JSON.stringify({tasks: Array.from(tasks.values())}), {headers: {"Content-Type": "application/json"}});
 }
 
 export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Navigator}) {
@@ -94,6 +104,9 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Na
         if (e.target?.name === "title")
             (e.target as HTMLInputElement).setAttribute("readonly", "");
     }, {capture: true});
+    window.document.querySelector("#toggleAll")!.addEventListener("change", ({target}) => {
+        h0.submit((target as HTMLInputElement).form!);
+    })
 }
 
 export function selectRoot(doc: Document) { return doc.querySelector(".todoapp"); }

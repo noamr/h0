@@ -40,7 +40,7 @@ function submit(form: HTMLFormElement, handle: Handler, submitter?: HTMLElement 
     let body : FormData | null = new FormData(form);
     const method = (submitter?.getAttribute("formmethod") || form.method || "GET").toUpperCase();
     const isGet = method === "GET";
-    let action = form.action;
+    let action = submitter?.getAttribute("formaction") || form.action;
     if (isGet) {
         const url = new URL(action);
         for (const [k, v] of body)
@@ -70,7 +70,7 @@ function captureEvents(rootElement: HTMLElement, handle: Handler) {
 }
 
 function createHandler({render, scope, route, selectRoot, options}: H0Spec) {
-    return (req: Request, historyMode: HistoryMode) => {
+    const handle = (req: Request, historyMode: HistoryMode) => {
         const {pathname} = new URL(req.url);
         if (!pathname.startsWith(scope))
             return false;
@@ -82,12 +82,23 @@ function createHandler({render, scope, route, selectRoot, options}: H0Spec) {
             const response = await ((options.updates === "client" ? route : fetch)(req));
             if (!response)
                 location.href = req.url;
-            else
-                render(response, rootElement);
+            else {
+                switch (response.status) {
+                    case 200:
+                        render(response, rootElement);
+                        break;
+                    case 302:
+                        handle(new Request(response.headers.get("Location")!), "replace");
+                        break;
+
+                }
+            }
         })();
 
         return true;
     }
+
+    return handle;
 }
 
 async function clientPass({scope}: H0Spec, handle: Handler, {location}: Window) {

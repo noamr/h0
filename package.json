@@ -27,6 +27,6 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "esbuild src/h0-standalone.ts --outdir=dist --bundle --sourcemap=inline"
+    "build": "esbuild src/h0-standalone.ts --outdir=dist --bundle --sourcemap=inline --target=es2022"
   }
 }

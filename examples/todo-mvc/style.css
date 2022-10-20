@@ -1,12 +1,11 @@
-.todoapp input[name="completedCount"][value="0"] ~ * input[name="clearCompleted"] {
-    visibility: hidden;
+.todoapp[has-completed="false"] input[name="clearCompleted"] {
+    display: none;
 }
 
-.todoapp input[name="totalCount"][value="0"] ~ * {
-	display: none;
+.todoapp[has-tasks="false"] main {
+    display: none;
 }
 
-.todoapp input[name="filter"][value=""] ~ footer a[href$="#/"],
 nav a:target {
     border-color: #CE4646;
 }
@@ -88,7 +87,7 @@ main {
 	border-top: 1px solid #e6e6e6;
 }
 
-input[name="toggleAll"] {
+input#toggleAll {
 	appearance: none;
 	position: absolute;
 	bottom: 100%;
@@ -98,11 +97,11 @@ input[name="toggleAll"] {
 	padding: 10px 17px;
 }
 
-input[name="toggleAll"]:before {
+input#toggleAll:before {
 	content: '❯';
 }
 
-input[name="toggleAll"]:checked:before {
+input#toggleAll:checked:before {
 	color: #484848;
 }
 
@@ -193,4 +192,8 @@ nav a {
 
 .task:not(:hover, :focus-within) button[name="destroy"] {
 	opacity: 0;
+}
+
+#activeCount {
+    white-space: nowrap;
 }
