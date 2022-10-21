@@ -15,7 +15,7 @@ app.use(async (req, res, next) => {
     }
 
     const filename = path.resolve(__dirname, "." + req.path);
-    const {outputFiles: [{text}]} = await esbuild.build({entryPoints: [filename], write: false, bundle: true, format: "esm"});
+    const {outputFiles: [{text}]} = await esbuild.build({entryPoints: [filename], write: false, bundle: true, format: "esm", define: {RUNTIME: "\"window\""}});
     res.setHeader("Content-Type", "application/javascript");
     res.send(text);
 });

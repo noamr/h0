@@ -1,95 +1,124 @@
-const listAcounting = new WeakMap<Element, Map<string, Element>>();
-type UpdateItemFunc<V, ItemElement extends Element = Element> = (element: ItemElement, value: V, key: string) => void;
-type CreateItemFunc<ItemElement extends Element = Element> = (document: Document) => ItemElement;
+import { NodeStruct } from "linkedom/types/mixin/parent-node";
 
-type ModelSchema<V> = "object" | "array" | "entries" | ((v : V, i: number) => string) | ((e: [string, V], i: number) => string);
-interface ListUpdaterParams<V, ItemElement extends Element = Element, ListElement extends Element = Element, Schema extends ModelSchema<V> = any> {
-    modelSchema?: Schema;
-    keyAttribute: string;
-    createItem?: HTMLTemplateElement | CreateItemFunc<ItemElement>;
-    itemTagName?: string;
-    updateItem: UpdateItemFunc<V, ItemElement>;
+declare global {
+    var RUNTIME: "node" | "window" | "worker";
 }
 
-export function createListUpdater<V, ItemElement extends Element = Element, ListElement extends Element = Element, Schema extends ModelSchema<V> = any>(params: ListUpdaterParams<V, ItemElement, ListElement, ModelSchema<V>>) {
-    let {createItem, itemTagName, modelSchema, updateItem, keyAttribute} = params;
+type IsomorphicElement = Element | NodeStruct;
+type UpdateItemFunc<V> = (element: IsomorphicElement, value: V, key: string, index: number) => void;
+type CreateItemFunc = (document: Document) => Element;
 
-    if (!createItem) {
-        if (itemTagName)
-            createItem = (document: Document) => document.createElement(itemTagName!) as Element as ItemElement;
-        else
-            throw new TypeError("createItem or itemTagName required");
-    }
+interface Model<ValueType, EntryType = ValueType> {
+    entries: Iterable<EntryType>;
+    getKey: (entry: EntryType, index: number) => string;
+    getValue: (entry: EntryType) => ValueType;
+}
 
-    if ("tagName" in createItem && (createItem as Element).tagName === "TEMPLATE") {
-        const template = createItem;
-        createItem = () => (template as HTMLTemplateElement).content.firstElementChild?.cloneNode(true) as ItemElement;
-    }
+interface View<ValueType> {
+    container: IsomorphicElement,
+    createItem: CreateItemFunc,
+    updateItem: UpdateItemFunc<ValueType>,
+    keyAttribute: string
+}
 
-    let transformModel = (a: any) => a;
-    let keyGetter = modelSchema;
-    let valueGetter : ((v : V) => V) | ((e: [string, V]) => V) = (v: V) => v;
+interface ModelMapper<ValueType, EntryType = ValueType> {
+    model: Model<ValueType, EntryType>;
+    view: View<ValueType>;
+};
 
-    switch (modelSchema) {
-        case "object":
-            transformModel = (model: {[key: string]: V}) => Object.entries(model);
-        case "entries":
-            keyGetter = ([k, v]: [string, V]) => k;
-            valueGetter = ([k, v]: [string, V]) => v;
-            break;
-        case "array":
-            keyGetter = (v: V, i: number) => String(i);
-            break;
-    }
+const accounting = new WeakMap<IsomorphicElement, Map<string, IsomorphicElement>>();
 
-    if (typeof createItem !== "function" || typeof keyGetter !== "function" || typeof valueGetter !== "function" || typeof updateItem !== "function")
-        throw new TypeError("Invalid createItem");
+export function mapModelToListView<V, E = V>({view, model}: ModelMapper<V, E>) {
+    const {entries, getKey, getValue} = model;
+    const {container, createItem, updateItem, keyAttribute} = view;
+    const itemByKey = accounting.get(container) || new Map<string, IsomorphicElement>();
+    const document = container.ownerDocument;
+    accounting.set(container, itemByKey);
+    let lastElement: IsomorphicElement | null = null;
+    Array.from(entries).forEach((e, i) => {
+        const key = getKey(e, i);
+        const value = getValue(e);
+        let element: IsomorphicElement | null = lastElement?.nextElementSibling!;
+        if (!element || element.getAttribute(keyAttribute) !== key)
+            element = itemByKey.get(key) || null;
 
-    const accounting = new WeakMap<ListElement, Map<string, ItemElement>>();
-    type ModelType = "array" extends Schema ? V[] :
-                     "object" extends Schema ? {[key: string]: V} :
-                     "entries" extends Schema ? Array<[string, V]> :
-                     V;
-
-    return (view: ListElement, model: ModelType) => {
-        const itemByKey = accounting.get(view) || new Map<string, ItemElement>();
-        accounting.set(view, itemByKey);
-        let lastElement: Element | null = null;
-        transformModel(model).forEach((v: V, i: number) => {
-            const key = (keyGetter as (v: V, i: number) => string)(v, i);
-            const value = (valueGetter as (v: V ) => V)(v);
-            let element: ItemElement | null = lastElement?.nextElementSibling as ItemElement;
-            if (!element || element.getAttribute(keyAttribute) !== key)
-                element = itemByKey.get(key) || null;
+        if (!element) {
+            element = container.querySelector(`*[${keyAttribute}="${key}"]`);
 
             if (!element) {
-                element = view.querySelector(`${itemTagName || "*"}[${keyAttribute}="${key}"]`);
-
-                if (!element) {
-                    element = (createItem as CreateItemFunc<ItemElement>)(view.ownerDocument);
-                    element.setAttribute(keyAttribute, key);
-                    view.append(element);
-                }
-
-                itemByKey.set(key, element);
+                element = createItem(document);
+                element.setAttribute(keyAttribute, key);
+                container.append(element);
             }
 
-            if (element.previousElementSibling !== lastElement) {
-                if (lastElement)
-                    lastElement.after(element);
-                else
-                    view.prepend(element);
-            }
-
-            updateItem(element, value, key);
-            lastElement = element;
-        });
-
-        const first = () => lastElement ? lastElement.nextElementSibling : view.firstElementChild;
-
-        for (let toDelete = first(); toDelete; toDelete = first()) {
-            itemByKey.delete(toDelete.getAttribute(keyAttribute)!);
-            toDelete.remove();
+            itemByKey.set(key, element);
         }
+
+        if (element.previousElementSibling !== lastElement) {
+            if (lastElement)
+                lastElement.after(element as Element);
+            else
+                container.prepend(element as Element);
+        }
+
+        updateItem(element, value, key, i);
+        lastElement = element;
+    });
+
+    const first = () => lastElement ? lastElement.nextElementSibling : container.firstElementChild;
+
+    for (let toDelete = first(); toDelete; toDelete = first()) {
+        if (toDelete.tagName === "TEMPLATE")
+            continue;
+        itemByKey.delete(toDelete.getAttribute(keyAttribute)!);
+        toDelete.remove();
     }
+}
+
+export function objectModel<V>(object: {[key: string]: V}): Model<V, [string, V]> {
+    return {
+        getKey: e => e[0],
+        getValue: e => e[1],
+        entries: Object.entries(object)
+    }
+}
+
+export function arrayModel<V>(array: V[], key: keyof V): Model<V> {
+    return {
+        getKey: e => String(e[key]),
+        getValue: e => e,
+        entries: array
+    }
+}
+
+export function selectView(container: Element) : View<string> {
+    return {
+        container,
+        createItem: (document) => document.createElement("option"),
+        keyAttribute: "value",
+        updateItem: (element: IsomorphicElement, value: string) => { element.innerHTML = value; }
+    };
+}
+
+
+export function templateView<V>({container, template, keyAttribute, updateItem}:
+        {container: Element, template: Element, keyAttribute?: string, updateItem: UpdateItemFunc<V>}) : View<V> {
+    return {
+        container,
+        createItem: (document) => {
+            if (RUNTIME === "node") {
+                const frag = document.createElement("div");
+                frag.innerHTML = template.innerHTML;
+                const root = frag.firstElementChild!;
+                return root;
+            }
+
+            if (RUNTIME === "window")
+                return (template as HTMLTemplateElement).content.firstElementChild?.cloneNode(true) as Element;
+
+            throw new Error("unknown runtime");
+        },
+        keyAttribute: keyAttribute || "data-id",
+        updateItem
+    };
 }

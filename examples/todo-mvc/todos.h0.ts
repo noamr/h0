@@ -1,4 +1,5 @@
-import {createListUpdater} from "../../src/list";
+
+import {mapModelToListView, templateView, arrayModel} from "../../src/list";
 import {H0Navigator} from "../../src/h0";
 
 interface Task {
@@ -11,29 +12,29 @@ interface Model {
     tasks: Task[]
 }
 
-const updateTaskList = createListUpdater<Task>({
-    keyAttribute: "data-id",
-    itemTagName: "li",
-    modelSchema: (v: Task) => v.id,
-    updateItem: (element: Element, task: Task) => {
-        if (task.completed)
-            element.querySelector('input[name="completed"]')!.setAttribute("checked", "checked");
-        else
-            element.querySelector('input[name="completed"]')!.removeAttribute("checked");
-
-        element.querySelector("input[name=title]")!.setAttribute("value", task.title);
-        element.querySelector("input[name=id]")!.setAttribute("value", task.id);
-    },
-    createItem: document.querySelector(".item-template") as HTMLTemplateElement
-})
-
 export async function render(response: Response, root: Element) {
     const {tasks} = (await response.json()) as Model;
     const active = tasks.filter(t => !t.completed);
     const completed = tasks.filter(t => t.completed);
     root.querySelector("#activeCount")!.innerHTML = `${active.length} task${active.length === 1 ? "" : "s"} remaining`;
     const list = root.querySelector(".todo-list")!;
-    updateTaskList(list, location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks);
+    mapModelToListView<Task>({
+        model: arrayModel(location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks, "id"),
+        view: templateView({
+            container: list,
+            template: list.querySelector(".item-template")!,
+            keyAttribute: "data-id",
+            updateItem: (element: Element, task: Task) => {
+                if (task.completed)
+                    element.querySelector('input[name="completed"]')!.setAttribute("checked", "checked");
+                else
+                    element.querySelector('input[name="completed"]')!.removeAttribute("checked");
+
+                element.querySelector("input[name=title]")!.setAttribute("value", task.title);
+                element.querySelector("input[name=id]")!.setAttribute("value", task.id);
+            }
+        })
+    });
     root.setAttribute("has-completed", completed.length ? "true" : "false");
     root.setAttribute("has-tasks", tasks.length ? "true" : "false");
 }
