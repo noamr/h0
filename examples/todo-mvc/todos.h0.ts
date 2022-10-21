@@ -22,9 +22,9 @@ export async function render(response: Response, root: Element) {
         model: arrayModel(location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks, "id"),
         view: templateView({
             container: list,
-            template: list.querySelector(".item-template")!,
+            template: document.querySelector(".item-template")!,
             keyAttribute: "data-id",
-            updateItem: (element: Element, task: Task) => {
+            updateItem: (element, task: Task) => {
                 if (task.completed)
                     element.querySelector('input[name="completed"]')!.setAttribute("checked", "checked");
                 else

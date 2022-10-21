@@ -1,12 +1,24 @@
 import {mapModelToListView, objectModel, selectView} from "../../src/list";
 
+interface Model {
+    from: string
+    to: string
+    symbols: {[key: string]: string}
+    rates: {[key: string]: number}
+}
+
 export async function render(response: Response, root: HTMLElement) {
-    const {from, to, symbols, rates} = await response.json();
+    const {from, to, symbols, rates} = await response.json() as Model;
     root.querySelector("#from")!.innerHTML = from;
     root.querySelector("#to")!.innerHTML = to;
-    mapModelToListView<string, [string, string]>({
+    mapModelToListView({
         model: objectModel(symbols),
         view: selectView(root.querySelector("select#symbols")!)
+    });
+
+    mapModelToListView({
+        model: objectModel(rates),
+        view: selectView(root.querySelector("select#rates")!)
     });
 }
 

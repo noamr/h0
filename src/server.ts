@@ -24,7 +24,6 @@ export async function h0serve(app: Application, h0template: string) {
 
     app.route(scope).all(async (req, res, next) => {
         const mode = req.headers["sec-fetch-mode"];
-        console.log({mode});
         const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
         const responsePromise = route(fetchRequest);
         if (!responsePromise) {
@@ -53,7 +52,6 @@ export async function h0serve(app: Application, h0template: string) {
                 entryPoints: [temp],
                 define: {RUNTIME: "\"window\""},
                 bundle: true, format: "esm", write: false, target: "es2020", sourcemap: "inline"});
-            console.log(outputFiles[0].text);
             rmSync(temp);
             const document = new DOMParser().parseFromString(documentMaster.toString(), "text/html")!;
             const initScript = document.createElement("script");
