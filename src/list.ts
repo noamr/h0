@@ -1,11 +1,10 @@
-import { NodeStruct } from "linkedom/types/mixin/parent-node";
+import { Element } from "linkedom";
 
 declare global {
     var RUNTIME: "node" | "window" | "worker";
 }
 
-type DOMElement = Element | NodeStruct;
-type UpdateItemFunc<V> = (element: DOMElement, value: V, key: string, index: number) => void;
+type UpdateItemFunc<V> = (element: Element, value: V, key: string, index: number) => void;
 type CreateItemFunc = (document: Document) => Element;
 
 interface Model<ValueType, EntryType = ValueType> {
@@ -15,7 +14,7 @@ interface Model<ValueType, EntryType = ValueType> {
 }
 
 interface View<ValueType> {
-    container: DOMElement,
+    container: Element,
     createItem: CreateItemFunc,
     updateItem: UpdateItemFunc<ValueType>,
     keyAttribute: string
@@ -26,19 +25,19 @@ interface ModelMapper<ValueType, EntryType = ValueType> {
     view: View<ValueType>;
 };
 
-const accounting = new WeakMap<DOMElement, Map<string, DOMElement>>();
+const accounting = new WeakMap<Element, Map<string, Element>>();
 
 export function mapModelToListView<V, E = V>({view, model}: ModelMapper<V, E>) {
     const {entries, getKey, getValue} = model;
     const {container, createItem, updateItem, keyAttribute} = view;
-    const itemByKey = accounting.get(container) || new Map<string, DOMElement>();
+    const itemByKey = accounting.get(container) || new Map<string, Element>();
     const document = container.ownerDocument;
     accounting.set(container, itemByKey);
-    let lastElement: DOMElement | null = null;
+    let lastElement: Element | null = null;
     Array.from(entries).forEach((e, i) => {
         const key = getKey(e, i);
         const value = getValue(e);
-        let element: DOMElement | null = lastElement?.nextElementSibling!;
+        let element: Element | null = lastElement?.nextElementSibling!;
         if (!element || element.getAttribute(keyAttribute) !== key)
             element = itemByKey.get(key) || null;
 
@@ -89,12 +88,12 @@ export function arrayModel<V>(array: V[], key: keyof V): Model<V> {
     }
 }
 
-export function selectView(container: DOMElement) : View<any> {
+export function selectView(container: Element) : View<any> {
     return {
         container,
         createItem: (document) => document.createElement("option"),
         keyAttribute: "value",
-        updateItem: (element: DOMElement, value: string) => { element.innerHTML = value; }
+        updateItem: (element: Element, value: string) => { element.innerHTML = value; }
     };
 }
 

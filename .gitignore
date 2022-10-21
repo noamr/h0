@@ -104,3 +104,6 @@ dist
 .tern-port
 
 *.ts.js
+/test-results/
+/playwright-report/
+/playwright/.cache/

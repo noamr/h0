@@ -1,5 +1,6 @@
 import { arrayModel, mapModelToListView, objectModel } from "../src/list";
 import {DOMParser} from "linkedom";
+import { test, expect } from '@playwright/test';
 
 function emptyDoc() {
     return new DOMParser().parseFromString("<html><body><ul></ul></html>", "text/html")    
