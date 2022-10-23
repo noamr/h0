@@ -1,71 +1,74 @@
 import {H0Spec} from "./h0";
-import {build} from "esbuild";
-import {readFileSync} from "fs";
-import { DOMParser} from "linkedom";
-import {dirname, resolve} from "path";
-import { Application } from "express";
-import {rmSync, writeFileSync} from "fs";
-import {tmpdir} from "os";
+import {DOMParser} from "linkedom";
+import Express from "express";
+import {resolve} from "path";
+import { build, buildSync } from "esbuild";
+import {rmSync, writeFileSync, readFileSync, existsSync} from "fs";
+import os from "os"
 import {randomUUID} from "crypto";
 
-export async function h0serve(app: Application, h0template: string) {
-    const dir = dirname(h0template);
-    const htmlMaster = readFileSync(h0template, "utf-8");
-    const documentMaster = new DOMParser().parseFromString(htmlMaster, "text/html");
-    for (const e of documentMaster.querySelectorAll("script[h0-runtime=standalone]"))
-        e.remove();
+export function h0router(folder: string) {
+    const index = resolve(folder, "index.h0.ts");
 
-    const h0link = documentMaster.querySelector('link[rel=h0]');
-    if (!h0link)
-        return;
+    if (!existsSync(index))
+        return null;
 
-    const specFilename = resolve(dir, h0link.getAttribute("href")!);
-    const {route, render, options, scope, selectRoot} = (await import(specFilename)) as H0Spec;
-
-    app.route(scope).all(async (req, res, next) => {
-        const mode = req.headers["sec-fetch-mode"];
-        const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
-        const responsePromise = route(fetchRequest);
-        if (!responsePromise) {
+    const {scope, route, render, selectRoot, template} = require(index) as H0Spec;
+    const expressRouter = Express.Router();
+    expressRouter.use(scope, Express.static(folder, {fallthrough: true}));
+    expressRouter.use(async (req: Express.Request, res: Express.Response, next: () => void) => {
+        if (!req.path.startsWith(scope)) {
             next();
             return;
         }
 
-        const response = await responsePromise;
-        if (!response) {
-            res.sendStatus(404);
+        console.log(req.path);
+
+        if (req.path.endsWith("h0.bundle.js")) {
+            const tmp = `${os.tmpdir}/${randomUUID()}.ts`;
+            writeFileSync(tmp, `
+                import {H0Client} from "${resolve(__dirname, "client.ts")}";
+                import * as spec from "${index}";
+                export const h0client = new H0Client(spec);
+            `);
+            const {outputFiles} = buildSync({
+                entryPoints: [tmp], bundle: true, sourcemap: "inline", format: "esm", target: "es2020", write: false,
+            define: {RUNTIME: "\"window\""}});
+            rmSync(tmp);
+            res.setHeader("Content-Type", "application/javascript");
+            res.send(outputFiles[0].text);
             return;
         }
-        for (const [h, v] of response.headers.entries())
-            res.setHeader(h, v);
 
-        if (mode === "navigate") {
-            res.setHeader("Content-Type", "text/html");
-            const temp = resolve(tmpdir(), `${randomUUID()}.js`);
-            writeFileSync(temp,  `
-                import * as spec from "${specFilename}";
-                import {initClient} from "${resolve(__dirname, 'h0.ts')}";
-                initClient(spec, window);
-            `);
+        const html = readFileSync(resolve(folder, template), "utf-8");
+        const mode = req.headers["sec-fetch-mode"];
+        const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
+        const response = await route?.(fetchRequest);
+        if (response) {
+            for (const [h, v] of response.headers.entries())
+                res.setHeader(h, v);
+        }
 
-            const {outputFiles} = await build({
-                entryPoints: [temp],
-                define: {RUNTIME: "\"window\""},
-                bundle: true, format: "esm", write: false, target: "es2020", sourcemap: "inline"});
-            rmSync(temp);
-            const document = new DOMParser().parseFromString(documentMaster.toString(), "text/html")!;
-            const initScript = document.createElement("script");
-            initScript.setAttribute("type", "module");
-                initScript.innerHTML = outputFiles[0].text;
-            document.appendChild(initScript);
-            if (options.firstPass === "server") {
-                const rootElement = selectRoot(document as any as Document);
-                await render(response, rootElement as any as HTMLElement);
-            }
-            res.send(document.toString());
-        } else
-            res.send(await response.text());
+        if (mode !== "navigate") {
+            if (response)
+                res.send(await response.text());
+            else
+                next();
+            return;
+        }
 
+        res.setHeader("Content-Type", "text/html");
+        if (!response || !render) {
+            res.send(html);
+            return;
+        }
 
+        const document = new DOMParser().parseFromString(html, "text/html");
+        const rootElement = selectRoot(document);
+        globalThis.RUNTIME = "node";
+        await render(response, rootElement as HTMLElement);
+        res.send(document.toString());
     });
+
+    return expressRouter;
 }

@@ -1,6 +1,6 @@
 
 import {mapModelToListView, templateView, arrayModel} from "../../src/list";
-import {H0Navigator} from "../../src/h0";
+import { Navigator } from "../../src/client";
 
 interface Task {
     id: string;
@@ -16,10 +16,12 @@ export async function render(response: Response, root: Element) {
     const {tasks} = (await response.json()) as Model;
     const active = tasks.filter(t => !t.completed);
     const completed = tasks.filter(t => t.completed);
+    const document = root.ownerDocument;
     root.querySelector("#activeCount")!.innerHTML = `${active.length} task${active.length === 1 ? "" : "s"} remaining`;
     const list = root.querySelector(".todo-list")!;
     mapModelToListView<Task>({
-        model: arrayModel(location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks, "id"),
+        model: arrayModel(
+            (RUNTIME == "node" ? tasks : (location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks)), "id"),
         view: templateView({
             container: list,
             template: document.querySelector(".item-template")!,
@@ -82,7 +84,7 @@ export async function route(request: Request) : Promise<Response> {
 
             }
             save();
-            return Response.redirect("/todos");
+            return Response.redirect(scope);
         }
 
         default:
@@ -90,12 +92,12 @@ export async function route(request: Request) : Promise<Response> {
         }
 }
 
-export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Navigator}) {
+export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: Navigator}) {
     window.addEventListener("hashchange", () => h0.reload());
     const list = root.querySelector(".todo-list") as HTMLUListElement;
     list.addEventListener("change", e => {
         if (e.target?.name === "completed")
-            h0.submit((e.target as HTMLInputElement).form!);
+            h0.submitForm((e.target as HTMLInputElement).form!);
     }, {capture: true});
     list.addEventListener("dblclick", e => {
         if (e.target?.name === "title")
@@ -106,12 +108,14 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Na
             (e.target as HTMLInputElement).setAttribute("readonly", "");
     }, {capture: true});
     window.document.querySelector("#toggleAll")!.addEventListener("change", ({target}) => {
-        h0.submit((target as HTMLInputElement).form!);
+        h0.submitForm((target as HTMLInputElement).form!);
     })
 }
 
+export const template = "todos.html";
+
 export function selectRoot(doc: Document) { return doc.querySelector(".todoapp"); }
-export const scope = "/todos";
+export const scope = "/todos/";
 export const options = {
     updates: "client"
 }

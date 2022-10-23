@@ -1,7 +1,8 @@
-import { Element } from "linkedom";
 
 declare global {
     var RUNTIME: "node" | "window" | "worker";
+    var WINDOW_ONLY: (callback: (w: Window) => void) => void
+    var NODE_ONLY: (callback: (g: Global) => void) => void
 }
 
 type UpdateItemFunc<V> = (element: Element, value: V, key: string, index: number) => void;
@@ -93,7 +94,7 @@ export function selectView(container: Element) : View<any> {
         container,
         createItem: (document) => document.createElement("option"),
         keyAttribute: "value",
-        updateItem: (element: Element, value: string) => { element.innerHTML = value; }
+        updateItem: (element: Element, value: string) => { element.innerHTML = "" + value; }
     };
 }
 
