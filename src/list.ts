@@ -1,12 +1,6 @@
-
-declare global {
-    var RUNTIME: "node" | "window" | "worker";
-    var WINDOW_ONLY: (callback: (w: Window) => void) => void
-    var NODE_ONLY: (callback: (g: Global) => void) => void
-}
-
+import * as LinkeDom from "linkedom";
 type UpdateItemFunc<V> = (element: Element, value: V, key: string, index: number) => void;
-type CreateItemFunc = (document: Document) => Element;
+type CreateItemFunc = (document: globalThis.Document) => globalThis.Element;
 
 interface Model<ValueType, EntryType = ValueType> {
     entries: Iterable<EntryType>;
@@ -15,7 +9,7 @@ interface Model<ValueType, EntryType = ValueType> {
 }
 
 interface View<ValueType> {
-    container: Element,
+    container: globalThis.Element | LinkeDom.HTMLElement,
     createItem: CreateItemFunc,
     updateItem: UpdateItemFunc<ValueType>,
     keyAttribute: string

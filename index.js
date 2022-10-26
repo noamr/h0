@@ -1,15 +1,10 @@
 const express = require("express");
-const path = require("path");
 const app = express();
-const esbuild = require("esbuild");
 require("@babel/register")({extensions: ['.js', '.ts']});
 
-const {h0router} = require("./src/server.ts");
-const { readFileSync } = require("fs");
-app.use(h0router("examples/rates"));
-app.use(h0router("examples/todo-mvc"));
-
-app.use(express.static("."));
+const {routerFromFolder} = require("./src/server.ts");
+app.use(routerFromFolder("examples/rates"));
+app.use(routerFromFolder("examples/todo-mvc"));
 
 app.listen(3000, () => {
     console.log("App running");

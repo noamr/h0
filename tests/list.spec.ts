@@ -1,31 +1,32 @@
-import { arrayModel, mapModelToListView, objectModel } from "../src/list";
+import { mapModelToListView, objectModel } from "../src/list";
 import {DOMParser} from "linkedom";
 import { test, expect } from '@playwright/test';
+import * as LinkeDom from "linkedom"
 
 function emptyDoc() {
-    return new DOMParser().parseFromString("<html><body><ul></ul></html>", "text/html")    
+    return new DOMParser().parseFromString("<html><body><ul></ul></html>", "text/html")
 }
 
 test("list updater with object schema", () => {
     const doc = emptyDoc();
     mapModelToListView({
         view: {
-            container: doc.querySelector("ul"),
+            container: doc.querySelector("ul") as LinkeDom.HTMLUListElement,
             keyAttribute: "id",
-            createItem: d => d.createElement("li"),
+            createItem: d => d.createElement("li")!,
             updateItem: (li, value, key) => { li.innerHTML =  `${key}: ${value}`; }
         },
         model: objectModel( {a: 123, b: 456})
     });
 
-    expect(doc.querySelector("ul").outerHTML).toEqual(`<ul><li id="a">a: 123</li><li id="b">b: 456</li></ul>`);
+    expect(doc.querySelector("ul")!.outerHTML).toEqual(`<ul><li id="a">a: 123</li><li id="b">b: 456</li></ul>`);
 });
 
 test("list updater with array schema", () => {
     const doc = emptyDoc();
     mapModelToListView({
         view: {
-            container: doc.querySelector("ul"),
+            container: doc.querySelector("ul") as LinkeDom.HTMLUListElement,
             updateItem: (li, value, key) => { li.innerHTML = `${key}: ${value}`; },
             createItem: d => d.createElement("li"),
             keyAttribute: "id"

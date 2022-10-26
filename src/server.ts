@@ -7,32 +7,50 @@ import {rmSync, writeFileSync, readFileSync, existsSync} from "fs";
 import os from "os"
 import {randomUUID} from "crypto";
 
-export function h0router(folder: string) {
-    const index = resolve(folder, "index.h0.ts");
+interface ServerConfig {
+    templateHTML: string
+    indexModule: string
+    publicFolder?: string
+}
 
-    if (!existsSync(index))
+export function routerFromFolder(folder: string) {
+    const indexModule = resolve(folder, "index.h0.ts");
+    const publicFolder = resolve(folder, "public");
+    const htmlFile = resolve(folder, "template.h0.html"), ;
+    if (!existsSync(htmlFile)) {
+        console.error(`Template ${htmlFile} not found`);
         return null;
+    }
+    const templateHTML = readFileSync(htmlFile, "utf-8");
+    return router({templateHTML, indexModule, publicFolder});
+}
 
-    const {scope, route, render, selectRoot, template} = require(index) as H0Spec;
+export function router({templateHTML, indexModule, publicFolder}: ServerConfig) {
+    if (!existsSync(indexModule)) {
+        console.error(`Module ${indexModule} not found`);
+        return null;
+    }
+
+    const {scope, route, render, selectRoot} = require(indexModule) as H0Spec;
     const expressRouter = Express.Router();
-    expressRouter.use(scope, Express.static(folder, {fallthrough: true}));
+    if (publicFolder && existsSync(publicFolder))
+        expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));
+
     expressRouter.use(async (req: Express.Request, res: Express.Response, next: () => void) => {
         if (!req.path.startsWith(scope)) {
             next();
             return;
         }
 
-        console.log(req.path);
-
         if (req.path.endsWith("h0.bundle.js")) {
             const tmp = `${os.tmpdir}/${randomUUID()}.ts`;
             writeFileSync(tmp, `
                 import {H0Client} from "${resolve(__dirname, "client.ts")}";
-                import * as spec from "${index}";
+                import * as spec from "${indexModule}";
                 export const h0client = new H0Client(spec);
             `);
             const {outputFiles} = buildSync({
-                entryPoints: [tmp], bundle: true, sourcemap: "inline", format: "esm", target: "es2020", write: false,
+                entryPoints: [tmp], bundle: true, sourcemap: "inline", format: "esm", target: "chrome108", write: false,
             define: {RUNTIME: "\"window\""}});
             rmSync(tmp);
             res.setHeader("Content-Type", "application/javascript");
@@ -40,7 +58,6 @@ export function h0router(folder: string) {
             return;
         }
 
-        const html = readFileSync(resolve(folder, template), "utf-8");
         const mode = req.headers["sec-fetch-mode"];
         const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
         const response = await route?.(fetchRequest);
@@ -59,11 +76,11 @@ export function h0router(folder: string) {
 
         res.setHeader("Content-Type", "text/html");
         if (!response || !render) {
-            res.send(html);
+            res.send(templateHTML);
             return;
         }
 
-        const document = new DOMParser().parseFromString(html, "text/html");
+        const document = new DOMParser().parseFromString(templateHTML, "text/html");
         const rootElement = selectRoot(document);
         globalThis.RUNTIME = "node";
         await render(response, rootElement as HTMLElement);

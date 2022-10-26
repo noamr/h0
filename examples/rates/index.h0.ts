@@ -32,4 +32,3 @@ export async function route() : Promise<Response> {
 export function selectRoot(doc: Document) { return doc.querySelector("main") as Element; }
 
 export const scope = "/rates/";
-export const template = "rates.html";
