@@ -16,7 +16,7 @@ interface ServerConfig {
 export function routerFromFolder(folder: string) {
     const indexModule = resolve(folder, "index.h0.ts");
     const publicFolder = resolve(folder, "public");
-    const htmlFile = resolve(folder, "template.h0.html"), ;
+    const htmlFile = resolve(folder, "template.h0.html");
     if (!existsSync(htmlFile)) {
         console.error(`Template ${htmlFile} not found`);
         return null;

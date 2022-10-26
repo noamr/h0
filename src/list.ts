@@ -20,7 +20,7 @@ interface ModelMapper<ValueType, EntryType = ValueType> {
     view: View<ValueType>;
 };
 
-const accounting = new WeakMap<Element, Map<string, Element>>();
+const accounting = new WeakMap<Element | LinkeDom.HTMLElement, Map<string, Element>>();
 
 export function mapModelToListView<V, E = V>({view, model}: ModelMapper<V, E>) {
     const {entries, getKey, getValue} = model;
@@ -32,12 +32,12 @@ export function mapModelToListView<V, E = V>({view, model}: ModelMapper<V, E>) {
     Array.from(entries).forEach((e, i) => {
         const key = getKey(e, i);
         const value = getValue(e);
-        let element: Element | null = lastElement?.nextElementSibling!;
+        let element: Element | LinkeDom.HTMLElement | null = lastElement?.nextElementSibling!;
         if (!element || element.getAttribute(keyAttribute) !== key)
             element = itemByKey.get(key) || null;
 
         if (!element) {
-            element = container.querySelector(`*[${keyAttribute}="${key}"]`);
+            element = container.querySelector(`*[${keyAttribute}="${key}"]`) as HTMLElement;
 
             if (!element) {
                 element = createItem(document);
