@@ -114,6 +114,3 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: Navi
 
 export function selectRoot(doc: Document) { return doc.querySelector(".todoapp"); }
 export const scope = "/todos/";
-export const options = {
-    updates: "client"
-}

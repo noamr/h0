@@ -11,9 +11,14 @@ interface ServerConfig {
     templateHTML: string
     indexModule: string
     publicFolder?: string
+    options?: ServerOptions
 }
 
-export function routerFromFolder(folder: string) {
+export interface ServerOptions {
+    serverSideRendering: boolean;
+}
+
+export function routerFromFolder(folder: string, options?: ServerOptions) {
     const indexModule = resolve(folder, "index.h0.ts");
     const publicFolder = resolve(folder, "public");
     const htmlFile = resolve(folder, "template.h0.html");
@@ -22,14 +27,16 @@ export function routerFromFolder(folder: string) {
         return null;
     }
     const templateHTML = readFileSync(htmlFile, "utf-8");
-    return router({templateHTML, indexModule, publicFolder});
+    return router({templateHTML, indexModule, publicFolder, options});
 }
 
-export function router({templateHTML, indexModule, publicFolder}: ServerConfig) {
+export function router({templateHTML, indexModule, publicFolder, options}: ServerConfig) {
     if (!existsSync(indexModule)) {
         console.error(`Module ${indexModule} not found`);
         return null;
     }
+
+    const serverSideRendering = !!(options?.serverSideRendering);
 
     const {scope, route, render, selectRoot} = require(indexModule) as H0Spec;
     const expressRouter = Express.Router();
@@ -45,9 +52,9 @@ export function router({templateHTML, indexModule, publicFolder}: ServerConfig) 
         if (req.path.endsWith("h0.bundle.js")) {
             const tmp = `${os.tmpdir}/${randomUUID()}.ts`;
             writeFileSync(tmp, `
-                import {H0Client} from "${resolve(__dirname, "client.ts")}";
+                import {initClient} from "${resolve(__dirname, "client.ts")}";
                 import * as spec from "${indexModule}";
-                export const h0client = new H0Client(spec);
+                initClient(spec);
             `);
             const {outputFiles} = buildSync({
                 entryPoints: [tmp], bundle: true, sourcemap: "inline", format: "esm", target: "chrome108", write: false,
@@ -75,7 +82,7 @@ export function router({templateHTML, indexModule, publicFolder}: ServerConfig) 
         }
 
         res.setHeader("Content-Type", "text/html");
-        if (!response || !render) {
+        if (!response || !render || !serverSideRendering) {
             res.send(templateHTML);
             return;
         }
