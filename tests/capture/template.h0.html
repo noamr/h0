@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="module" src="/capture/h0.bundle.js"></script>
+    </head>
+    <body>
+        <h1>Capture Test</h1>
+        <main>
+            <form method="post" action="/capture/">
+                <input type="hidden" name="foo" value="1">
+                <input type="submit" name="sub1" value="sub">
+                <input type="button" name="b1" value="b1" formmethod="get">
+                <input type="button" name="b2" value="b1" formaction="/capture/button">
+            </form>
+            <a id="internal" href="/capture/internal">internal</a>
+            <a id="external" href="/external">external</a>
+            <output id="path"></output>
+            <output id="method"></output>
+            <output id="renders"></output>
+        </main>
+    </body>
+</html>

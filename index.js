@@ -5,6 +5,7 @@ require("@babel/register")({extensions: ['.js', '.ts']});
 const {routerFromFolder} = require("./src/server.ts");
 app.use(routerFromFolder("examples/rates"));
 app.use(routerFromFolder("examples/todo-mvc"));
+app.use(routerFromFolder("tests/capture"));
 
 app.listen(3000, () => {
     console.log("App running");

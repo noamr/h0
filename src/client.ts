@@ -14,7 +14,8 @@ export interface Navigator {
 
 export function initClient(spec: H0Spec, context: Window = window) {
     const route = spec.route || ((r: RequestInfo) => fetch(r));
-    const rootElement = spec.selectRoot(document);
+    const {scope, selectRoot, render, mount} = spec;
+    const rootElement = selectRoot(document);
     if (!rootElement)
         throw new Error(`Root element not found`);
 
@@ -28,13 +29,12 @@ export function initClient(spec: H0Spec, context: Window = window) {
             e.preventDefault();
     }, {capture: true});
 
-    navigate(location.pathname.startsWith(spec.scope) ? location.href : spec.scope, "replace");
+    navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
     if (RUNTIME === "window")
-        spec.mount?.(rootElement as HTMLElement, {window: context, h0: {navigate, reload, submitForm}});
+        mount?.(rootElement as HTMLElement, {window: context, h0: {navigate, reload, submitForm}});
 
     function navigate(info: RequestInfo, historyMode: HistoryMode) {
         const req = new Request(info);
-        const {scope, selectRoot, render} = spec;
         const {pathname} = new URL(req.url);
         if (!pathname.startsWith(scope))
             return false;
@@ -80,5 +80,5 @@ export function initClient(spec: H0Spec, context: Window = window) {
         return navigate(url.href, historyMode);
     }
 
-    function reload() { return navigate(spec.scope, "transparent"); }
+    function reload() { return navigate(scope, "transparent"); }
 }

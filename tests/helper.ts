@@ -1,8 +1,8 @@
-import { ServeOptions } from "esbuild";
+import { ServerOptions } from "../src/server";
 
 require("@babel/register")({extensions: ['.js', '.ts']});
 const getPort = require("find-free-port");
-export async function serveFolder(folder: string, options?: ServeOptions) {
+export async function serveFolder(folder: string, options?: ServerOptions) {
     const [port] = await getPort(3000);
     const express = require("express");
     const app = express();

@@ -2,7 +2,7 @@ import {H0Spec} from "./h0";
 import {DOMParser} from "linkedom";
 import Express from "express";
 import {resolve} from "path";
-import { build, buildSync } from "esbuild";
+import { buildSync } from "esbuild";
 import {rmSync, writeFileSync, readFileSync, existsSync} from "fs";
 import os from "os"
 import {randomUUID} from "crypto";
