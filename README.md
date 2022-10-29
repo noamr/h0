@@ -41,7 +41,7 @@ export async function render(response: Response, view: Element) {
     view.querySelector("#out").innerHTML = text;
 }
 
-// Do extra browser-only things.
+// Do extra browser-only things .
 export async function mount(root: HTMLElement) {
     window.addEventListener(...)
 }
@@ -56,13 +56,21 @@ Now `http://localhost:3000/hello/` is an SPA with server-side rendering.
 
 For a more detailed example, see `examples/todo-mvc`
 
-## Design Goals
+## "View Model" rendering
+
+Frontend today relies on the concept of a "view model" - holding the state of the application in a JSON-like structure
+and then mapping it to the DOM in an efficient way. Modern frameworks allow "server-side rendering": the description of
+how the model is mapped to the view can be applied both in the client and on the server.
+
+H0 provides view-model rendering, including server-side rendering and ways to efficiently update the DOM,
+and does not provide anything else, such as a component model.
+
+## No magic
 
 
+### Debugging Experience
 
-### Debugging Experience > Development Experience
 
-### No magic
 
 ### No "reactive"
 

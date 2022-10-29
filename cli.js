@@ -10,7 +10,7 @@ const optionDefinition = [
 ];
 
 const runOptions = commandLineArgs(optionDefinition, process.argv);
-const port = runOptions.port || 3000;
+const port = runOptions.port || process.env.PORT || 3000;
 if (!runOptions.dir?.length) {
     console.log("Required: dir");
     process.exit(0);
