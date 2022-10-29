@@ -23,7 +23,7 @@ test.describe('hello tests', () => {
         await page.goto(`http://localhost:${port}/hello/`);
 
         // Load the client side bundle
-        await page.evaluate("import ('/hello/h0.bundle.js')");
+        await page.evaluate("import ('/hello/.h0/client.js')");
         // Model is applied
         expect(await page.evaluate("document.querySelector('#text').innerHTML")).toEqual("Text from model");
 
@@ -44,7 +44,7 @@ test.describe('hello tests', () => {
         await page.goto(`http://localhost:${port}/hello/`);
 
         // Load the client side bundle
-        await page.evaluate("import ('/hello/h0.bundle.js')");
+        await page.evaluate("import ('/hello/.h0/client.js')");
         // Model is applied
         expect(await page.evaluate("document.querySelector('#text').innerHTML")).toEqual("Text from model");
 

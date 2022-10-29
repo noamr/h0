@@ -2,8 +2,8 @@ import {H0Spec} from "./h0";
 import {DOMParser} from "linkedom";
 import Express from "express";
 import {resolve} from "path";
-import { buildSync } from "esbuild";
-import {rmSync, writeFileSync, readFileSync, existsSync} from "fs";
+import { BuildOptions, buildSync } from "esbuild";
+import {rmSync, writeFileSync, readFileSync, existsSync, mkdirSync} from "fs";
 import os from "os"
 import {randomUUID} from "crypto";
 
@@ -16,25 +16,23 @@ interface ServerConfig {
 
 export interface ServerOptions {
     serverSideRendering: boolean;
+    esbuild: BuildOptions
 }
 
 export function routerFromFolder(folder: string, options?: ServerOptions) {
     const indexModule = resolve(folder, "index.h0.ts");
     const publicFolder = resolve(folder, "public");
     const htmlFile = resolve(folder, "template.h0.html");
-    if (!existsSync(htmlFile)) {
-        console.error(`Template ${htmlFile} not found`);
-        return null;
-    }
-    const templateHTML = readFileSync(htmlFile, "utf-8");
+    if (!existsSync(htmlFile))
+       throw new Error(`Template ${htmlFile} not found`);
+
+       const templateHTML = readFileSync(htmlFile, "utf-8");
     return router({templateHTML, indexModule, publicFolder, options});
 }
 
 export function router({templateHTML, indexModule, publicFolder, options}: ServerConfig) {
-    if (!existsSync(indexModule)) {
-        console.error(`Module ${indexModule} not found`);
-        return null;
-    }
+    if (!existsSync(indexModule))
+        throw new Error(`Module ${indexModule} not found`);
 
     const serverSideRendering = !!(options?.serverSideRendering);
 
@@ -43,25 +41,25 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
     if (publicFolder && existsSync(publicFolder))
         expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));
 
+    const tmpdir = `${os.tmpdir}/h0-${randomUUID()}`;
+    const tmp = `${os.tmpdir}/h0-${randomUUID()}.ts`;
+    mkdirSync(tmpdir);
+    writeFileSync(tmp, `
+        import {initClient} from "${resolve(__dirname, "client.ts")}";
+        import * as spec from "${indexModule}";
+        initClient(spec);
+    `);
+
+    buildSync({
+        entryPoints: [tmp], bundle: true, sourcemap: "linked", format: "esm", target: "chrome108", outfile: resolve(tmpdir, "client.js"),
+        define: {RUNTIME: "\"window\""}, ...options?.esbuild});
+    rmSync(tmp);
+
+    expressRouter.use(resolve(scope, ".h0"), Express.static(tmpdir, {fallthrough: true}));
+
     expressRouter.use(async (req: Express.Request, res: Express.Response, next: () => void) => {
         if (!req.path.startsWith(scope)) {
             next();
-            return;
-        }
-
-        if (req.path.endsWith("h0.bundle.js")) {
-            const tmp = `${os.tmpdir}/${randomUUID()}.ts`;
-            writeFileSync(tmp, `
-                import {initClient} from "${resolve(__dirname, "client.ts")}";
-                import * as spec from "${indexModule}";
-                initClient(spec);
-            `);
-            const {outputFiles} = buildSync({
-                entryPoints: [tmp], bundle: true, sourcemap: "inline", format: "esm", target: "chrome108", write: false,
-            define: {RUNTIME: "\"window\""}});
-            rmSync(tmp);
-            res.setHeader("Content-Type", "application/javascript");
-            res.send(outputFiles[0].text);
             return;
         }
 
@@ -88,7 +86,7 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
         }
 
         const document = new DOMParser().parseFromString(templateHTML, "text/html");
-        const rootElement = selectRoot(document);
+        const rootElement = selectRoot(document as any as Document);
         globalThis.RUNTIME = "node";
         await render(response, rootElement as HTMLElement);
         res.send(document.toString());

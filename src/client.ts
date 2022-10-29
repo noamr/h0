@@ -67,9 +67,9 @@ export function initClient(spec: H0Spec, context: Window = window) {
     }
 
     function submitForm(form: HTMLFormElement, submitter?: HTMLElement | null) {
-        let body : FormData | null = new FormData(form);
+        const body : FormData | null = new FormData(form);
         const method = (submitter?.getAttribute("formmethod") || form.method || "GET").toUpperCase();
-        let action = submitter?.getAttribute("formaction") || form.action;
+        const action = submitter?.getAttribute("formaction") || form.action;
         const historyMode = action === location.href ? "replace" : "push";
         if (method === "POST")
             return navigate(new Request(action, {body, method}), historyMode);
