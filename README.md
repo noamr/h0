@@ -54,26 +54,84 @@ h0 hello
 
 Now `http://localhost:3000/hello/` is an SPA with server-side rendering.
 
-For a more detailed example, see `examples/todo-mvc`
 
-## "View Model" rendering
+https://todo-mvc.onrender.com/todos/
 
-Frontend today relies on the concept of a "view model" - holding the state of the application in a JSON-like structure
+## Design Principles
+
+### HTML first
+
+Your view is a plain HTML file. Serving it unmodified should "just work".
+There is no HTML-in-JS, CSS-in-JS, JSX-in-template-strings.
+
+### Clean, stable DOM
+
+To make the most out of H0 - keep the DOM hierarchy somewhat stable. You can easily turn parts of the DOM dormant
+by giving them `display: none` in CSS. The exception is lists with a number of elements that's derived
+from the model.
+
+By having a stable DOM hierarchy, there is less need for acrobatics such as the virtual DOM. Updating
+DOM attributes, contents and classes via selectors is clean and easy, you don't have to worry about whther
+a particular element exists or was removed, and entry/exit transitions are straightforward.
+
+### "View Model" rendering
+
+Most frontend dev today relies on the concept of a "view model" - holding the state of the application in a JSON-like structure
 and then mapping it to the DOM in an efficient way. Modern frameworks allow "server-side rendering": the description of
 how the model is mapped to the view can be applied both in the client and on the server.
 
-H0 provides view-model rendering, including server-side rendering and ways to efficiently update the DOM,
-and does not provide anything else, such as a component model.
+H0 provides model->view rendering, including server-side rendering and ways to efficiently update the DOM,
+but does not provide anything else.
 
-## No magic
+### List mapping
+
+### Hashing
+
+### No Magic, No lock-in
+
+#### Not "declarative"
+
+Modern frameworks are declarative: the have some language (JSX, Svelte) or templating DSL (Lit) to map the model to the view.
+
+Declarativity is "magic" - the efficient mapping is done "behind the scenes". This forces you to write your code in a framework-specific way,
+and porting it is difficult.
+
+In H0, the model->view mapping is not declarative. The only declarative layer is HTML/CSS. You serve your entire DOM with HTML
+perhaps with some template elements, and perform changes with JavaScript.
+
+#### Not "reactive"
+
+Modern frameworks are reactive: they provide some way for the view to react to events and apply changes, e.g. React hooks.
+
+Reactivity is "magic" - behind the scenes the framework has to work hard to schedule how and when different changes apply
+and which parts of the DOM need to be updated as a result.
+
+H0 is not reactive. It's a request/response model, like the traditional web. You can still use the inherent reactivity in the DOM,
+by using CSS and web components.
+
+#### No "components"
+
+Since H0 relies on pure JS functions (`route` and `render`), and on raw HTML, there is no need for an additional component model.
+You can use existing JS-based modular enablers like ESM, and hTML modular enablers like web-components and the template element.
 
 
-### Debugging Experience
+
+### Debugging Experience (aka DX)
+
+By having no magic, the code you write is 100% the code you run, so debugging is a lot more straightforward.
+And by following some design principles, you shouldn't end up with verbose or hard-to-read code.
 
 
+## TODO-MVC example
 
-### No "reactive"
+### Live version
+See live [here](https://todo-mvc.onrender.com/todos/)
 
-### No "declarative"
+### Code
+See `examples/todo-mvc`
 
-### No domain-specific languages
+### Explanation
+
+* Interactions are (predominantly) forms and links (`<a href>`).
+* "Write" actions are different POST paths, like a standard multi-page web application
+* The `render` function updates the view based on the list of tasks, with the special `mapModelToListView` function to efficiently map the task list to the DOM.
