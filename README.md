@@ -7,6 +7,27 @@ without the complexity and overhead of declarative/reactive frameworks.
 
 Write the same minimal JS to update your view, run it in node and in the browser, following a couple of principles to make it run optimally.
 
+## The Concept
+
+Your view is an HTML file. You can consider it as a "master" HTML file, or the template.
+You fill it with data using two functions: `route` and `render`.
+Each of those functions can run on the server and/or in the browser.
+
+### How it works
+
+- Choose the root URL path of your app (e.g. `/my-app/`)
+- Build a standard HTML file with your view in it.
+- Choose the root element of your view in your HTML file. By default it would be the document (`HTML`) element.
+- Write your `route` function: handle any `Request` that matches the root URL path, returning a `Response` with your view-model.
+  Your `route` function should run on the server and/or the client.
+- Write your `render` function: take the `Response` you received and apply it to the DOM.
+  Your `render` function should run on the client and/or the server.
+- Write your `mount` function (optionally) to add any custom event handlers.
+- If you want your app to be an SPA, import the generated bundle as an ES module.
+
+You're good to go!
+
+
 ## An ultra-minimal example
 ``` html
 <!-- hello/template.h0.html -->

@@ -35,8 +35,12 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
         throw new Error(`Module ${indexModule} not found`);
 
     const serverSideRendering = !!(options?.serverSideRendering);
+    const spec = require(indexModule) as H0Spec;;
 
-    const {scope, route, render, selectRoot} = require(indexModule) as H0Spec;
+    const scope = spec.scope || "/";
+    const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
+
+    const {route, render} = spec;
     const expressRouter = Express.Router();
     if (publicFolder && existsSync(publicFolder))
         expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));

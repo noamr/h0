@@ -1,20 +1,10 @@
-declare global {
-    var RUNTIME: "window" | "node";
-}
-
-import {H0Spec} from "./h0";
-
-export type HistoryMode = "push" | "replace" | "transparent";
-
-export interface Navigator {
-    navigate(info: RequestInfo, historyMode: HistoryMode): boolean;
-    submitForm(form: HTMLFormElement, submitter?: HTMLElement | null): boolean;
-    reload(): void;
-}
+import {H0Spec, HistoryMode} from "./h0";
 
 export function initClient(spec: H0Spec, context: Window = window) {
     const route = spec.route || ((r: RequestInfo) => fetch(r));
-    const {scope, selectRoot, render, mount} = spec;
+    const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
+    const scope = spec.scope || "/";
+    const {render, mount} = spec;
     const rootElement = selectRoot(document);
     if (!rootElement)
         throw new Error(`Root element not found`);
