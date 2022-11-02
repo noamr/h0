@@ -67,7 +67,7 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
             return;
         }
 
-        const mode = req.headers["sec-fetch-mode"];
+        const accept = req.headers["accept"];
         const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
         const response = await route?.(fetchRequest);
         if (response) {
@@ -75,7 +75,7 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
                 res.setHeader(h, v);
         }
 
-        if (mode !== "navigate") {
+        if (!accept?.includes("text/html")) {
             if (response)
                 res.send(await response.text());
             else
