@@ -1,5 +1,5 @@
 import { Document, Element, H0Spec } from "../../src/h0";
-import {mapModelToListView, objectModel, selectView} from "../../src/list";
+import {reconcileChildren, objectModel, selectView} from "../../src/reconcile";
 
 interface Model {
     from: string
@@ -14,12 +14,12 @@ export async function render(response: Response, root: HTMLElement) {
     root.querySelector("#from")!.innerHTML = from;
 
     root.querySelector("#to")!.innerHTML = to;
-    mapModelToListView({
+    reconcileChildren({
         model: objectModel(symbols),
         view: selectView(root.querySelector("select#symbols")!)
     });
 
-    mapModelToListView({
+    reconcileChildren({
         model: objectModel(rates),
         view: selectView(root.querySelector("select#rates")!)
     });

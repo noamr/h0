@@ -1,5 +1,5 @@
 
-import {mapModelToListView, templateView, arrayModel} from "../../src/list";
+import {reconcileChildren, templateView, arrayModel} from "../../src/reconcile";
 import { H0Navigator } from "../../src/h0";
 
 // Spec: https://github.com/tastejs/todomvc/blob/master/app-spec.md
@@ -85,7 +85,7 @@ export async function render(response: Response, root: Element) {
     root.querySelector("#activeCount")!.innerHTML = `${active.length} task${active.length === 1 ? "" : "s"} remaining`;
     const list = root.querySelector(".todo-list")!;
 
-    mapModelToListView<Task>({
+    reconcileChildren<Task>({
         model: arrayModel(
             (RUNTIME == "node" ? tasks : (location.hash === "#/completed" ? completed : location.hash === "#/active" ? active : tasks)), "id"),
         view: templateView({

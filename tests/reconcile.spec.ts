@@ -1,4 +1,4 @@
-import { mapModelToListView, objectModel } from "../src/list";
+import { reconcileChildren, objectModel } from "../src/reconcile";
 import {DOMParser} from "linkedom";
 import { test, expect } from '@playwright/test';
 import * as LinkeDom from "linkedom"
@@ -9,7 +9,7 @@ function emptyDoc() {
 
 test("list updater with object schema", () => {
     const doc = emptyDoc();
-    mapModelToListView({
+    reconcileChildren({
         view: {
             container: doc.querySelector("ul") as LinkeDom.HTMLUListElement,
             keyAttribute: "id",
@@ -24,7 +24,7 @@ test("list updater with object schema", () => {
 
 test("list updater with array schema", () => {
     const doc = emptyDoc();
-    mapModelToListView({
+    reconcileChildren({
         view: {
             container: doc.querySelector("ul") as LinkeDom.HTMLUListElement,
             updateItem: (li, value, key) => { li.innerHTML = `${key}: ${value}`; },

@@ -22,7 +22,7 @@ interface ModelMapper<ValueType, EntryType = ValueType> {
 
 const accounting = new WeakMap<Element | LinkeDom.HTMLElement, Map<string, Element>>();
 
-export function mapModelToListView<V, E = V>({view, model}: ModelMapper<V, E>) {
+export function reconcileChildren<V, E = V>({view, model}: ModelMapper<V, E>) {
     const {entries, getKey, getValue} = model;
     const {container, createItem, updateItem, keyAttribute} = view;
     const itemByKey = accounting.get(container) || new Map<string, Element>();

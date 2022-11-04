@@ -155,4 +155,4 @@ See `examples/todo-mvc`
 
 * Interactions are (predominantly) forms and links (`<a href>`).
 * "Write" actions are different POST paths, like a standard multi-page web application
-* The `render` function updates the view based on the list of tasks, with the special `mapModelToListView` function to efficiently map the task list to the DOM.
+* The `render` function updates the view based on the list of tasks, with the special `reconcileChildren` function to efficiently map the task list to the DOM.
