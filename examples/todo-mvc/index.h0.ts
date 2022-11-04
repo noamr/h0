@@ -1,6 +1,6 @@
 
 import {mapModelToListView, templateView, arrayModel} from "../../src/list";
-import { Navigator } from "../../src/client";
+import { H0Navigator } from "../../src/h0";
 
 // Spec: https://github.com/tastejs/todomvc/blob/master/app-spec.md
 interface Task {
@@ -107,7 +107,7 @@ export async function render(response: Response, root: Element) {
     root.setAttribute("has-tasks", tasks.length ? "true" : "false");
 }
 
-export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: Navigator}) {
+export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Navigator}) {
     window.addEventListener("hashchange", () => h0.reload());
     const list = root.querySelector(".todo-list") as HTMLUListElement;
 
@@ -124,6 +124,13 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: Navi
     list.addEventListener("blur", e => {
         if ((e.target as HTMLInputElement).name === "title")
             (e.target as HTMLInputElement).setAttribute("readonly", "");
+    }, {capture: true});
+
+    list.addEventListener("submit", e => {
+        const form = e.target as HTMLFormElement;
+        const title = form.elements.namedItem("title")! as HTMLInputElement;
+        title.blur();
+        title.setAttribute("readonly", "");
     }, {capture: true});
 
     window.document.querySelector("#toggleAll")!.addEventListener("change", ({target}) => {

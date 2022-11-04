@@ -10,27 +10,28 @@ import {randomUUID} from "crypto";
 interface ServerConfig {
     templateHTML: string
     indexModule: string
-    publicFolder?: string
+    publicFolders: string[]
     options?: ServerOptions
 }
 
 export interface ServerOptions {
     serverSideRendering: boolean;
+    additionalPublicFolders: string[];
     esbuild: BuildOptions
 }
 
 export function routerFromFolder(folder: string, options?: ServerOptions) {
     const indexModule = resolve(folder, "index.h0.ts");
-    const publicFolder = resolve(folder, "public");
+    const publicFolders = [...options?.additionalPublicFolders || [], resolve(folder, "public")];
     const htmlFile = resolve(folder, "template.h0.html");
     if (!existsSync(htmlFile))
        throw new Error(`Template ${htmlFile} not found`);
 
-       const templateHTML = readFileSync(htmlFile, "utf-8");
-    return router({templateHTML, indexModule, publicFolder, options});
+    const templateHTML = readFileSync(htmlFile, "utf-8");
+    return router({templateHTML, indexModule, publicFolders, options});
 }
 
-export function router({templateHTML, indexModule, publicFolder, options}: ServerConfig) {
+export function router({templateHTML, indexModule, publicFolders, options}: ServerConfig) {
     if (!existsSync(indexModule))
         throw new Error(`Module ${indexModule} not found`);
 
@@ -42,7 +43,7 @@ export function router({templateHTML, indexModule, publicFolder, options}: Serve
 
     const {route, render} = spec;
     const expressRouter = Express.Router();
-    if (publicFolder && existsSync(publicFolder))
+    for (const publicFolder of publicFolders.filter(existsSync))
         expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));
 
     const tmpdir = `${os.tmpdir}/h0-${randomUUID()}`;

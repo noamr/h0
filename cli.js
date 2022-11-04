@@ -22,7 +22,7 @@ for (const dir of runOptions.dir) {
     console.log(`H0: serving ${dir} at http://localhost:${port}${scope}`);
 }
 
-for (const p of runOptions.public) {
+for (const p of runOptions.public || []) {
     console.log(`H0: serving ${p} as public folder`);
     app.use(express.static(p));
 }

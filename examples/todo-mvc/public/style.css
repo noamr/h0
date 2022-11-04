@@ -26,6 +26,10 @@ input[type="submit"], input[type="button"] {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.todo-list li input[name="save"] {
+	visibility: hidden;
+}
+
 .todo-list li input[name="title"] {
 	word-break: break-all;
 	padding: 15px;
