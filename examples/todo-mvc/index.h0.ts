@@ -113,7 +113,7 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Na
 
     list.addEventListener("change", e => {
         if ((e.target as HTMLInputElement)?.name === "completed")
-            h0.submitForm((e.target as HTMLInputElement).form!);
+            (e.target as HTMLInputElement).form!.requestSubmit();
     }, {capture: true});
 
     list.addEventListener("dblclick", e => {
@@ -134,7 +134,7 @@ export function mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Na
     }, {capture: true});
 
     window.document.querySelector("#toggleAll")!.addEventListener("change", ({target}) => {
-        h0.submitForm((target as HTMLInputElement).form!);
+        (target as HTMLInputElement).form!.requestSubmit();
     })
 }
 

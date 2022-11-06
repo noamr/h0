@@ -21,7 +21,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
 
     navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
     if (RUNTIME === "window")
-        mount?.(rootElement as HTMLElement, {window: context, h0: {navigate, reload, submitForm}});
+        mount?.(rootElement as HTMLElement, {window: context, h0: {navigate, reload}});
 
     function navigate(info: RequestInfo, historyMode: HistoryMode) {
         const req = new Request(info);

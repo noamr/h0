@@ -6,7 +6,6 @@ export type HistoryMode = "push" | "replace" | "transparent";
 
 export interface H0Navigator {
     navigate(info: RequestInfo, historyMode: HistoryMode): boolean;
-    submitForm(form: HTMLFormElement, submitter?: HTMLElement | null): boolean;
     reload(): void;
 }
 
