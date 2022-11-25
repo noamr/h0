@@ -5,10 +5,10 @@ Most of the CSS is copied from the above link.
 
 ## To run
 - Get a [TMDB API key](https://developers.themoviedb.org/3/getting-started)
+- export TMDB_API_KEY=`<your-TMDB-API-key>`
 - nvm use
 - npm i
-- export TMDB_API_KEY=<your key>
-- node ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public
+- Run `yarn start:dev:ssr` 
 - http://localhost:8000
 
 ## Principles of development
