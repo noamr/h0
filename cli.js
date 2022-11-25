@@ -6,6 +6,7 @@ const commandLineArgs = require('command-line-args');
 const optionDefinition = [
     {name: 'port', alias: 'p', type: Number },
     {name: 'dir', alias: 'd', multiple: true, defaultOption: true},
+    {name: 'ssr', alias: 's', type: Boolean},
     {name: 'public', alias: 'u', multiple: true},
 ];
 
@@ -17,7 +18,10 @@ if (!runOptions.dir?.length) {
 }
 
 for (const dir of runOptions.dir) {
-    app.use(routerFromFolder(dir));
+    const options = {};
+    if (runOptions.ssr)
+        options.serverSideRendering = true;
+    app.use(routerFromFolder(dir, options));
     const {scope} = require(`${path.resolve(dir)}/index.h0.ts`);
     console.log(`H0: serving ${dir} at http://localhost:${port}${scope}`);
 }

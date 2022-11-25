@@ -36,6 +36,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         throw new Error(`Module ${indexModule} not found`);
 
     const serverSideRendering = !!(options?.serverSideRendering);
+    console.log({options})
     const spec = require(indexModule) as H0Spec;;
 
     const scope = spec.scope || "/";
@@ -70,6 +71,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
 
         const accept = req.headers["accept"];
         const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
+        globalThis.RUNTIME = "node";
         const response = await route?.(fetchRequest);
         if (response) {
             for (const [h, v] of response.headers.entries())
@@ -92,7 +94,6 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
 
         const document = new DOMParser().parseFromString(templateHTML, "text/html");
         const rootElement = selectRoot(document as any as Document);
-        globalThis.RUNTIME = "node";
         await render(response, rootElement as HTMLElement);
         res.send(document.toString());
     });
