@@ -314,7 +314,7 @@ a.poster {
   transition: transform var(--duration-shortest) var(--ease-in-out);
 }
 
-a:hover {
+#movieList a:hover {
   transform: scale(1.03);
 }
 
@@ -544,7 +544,7 @@ aside nav h3:not(:first-child) {
   height: 3rem;
 }
 
-aside {
+aside nav {
   position: fixed;
   width: 250px;
   max-width: 70%;
@@ -580,7 +580,7 @@ a:hover {
 }
 
 
-#hamburger:not(:focus-within) aside {
+#hamburger:not(:focus-within) aside nav {
   transform: translate(-100%);
 }
 
@@ -592,12 +592,36 @@ body[data-path="/movie"] main {
   display: none;
 }
 
-.the-genres {
+#movieGenresList {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
 }
 
+#movieGenresList a {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0rem;
+  color: var(--palette-secondary-main);
+  line-height: 1;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+#movieGenresList a:not(:last-child) {
+  margin-right: 2rem;
+}
+
+#movieGenresList a:hover {
+  text-decoration: underline;
+}
+
+#movieGenresList a:active {
+  transform: translateY(2px);
+}
 article h3 {
   margin-bottom: 1rem;
   color: var(--palette-text-primary);
@@ -609,5 +633,71 @@ article h3 {
 @media only screen and (max-width: 900px) {
   article h3 {
     font-size: 1.25rem;
+  }
+}
+
+p {
+  color: var(--palette-text-secondary);
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.8;
+  text-align: justify;
+}
+.artwork {
+  padding: 4rem;
+}
+
+@media only screen and (max-width: 1500px) {
+  .artwork {
+    padding: 3rem;
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  .artwork {
+    padding: 2rem;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .artwork {
+    padding: 0;
+    margin-top: -102px;
+  }
+}
+
+article {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  max-width: 120rem;
+  margin: 0 auto;
+  margin-bottom: 7rem;
+}
+
+@media only screen and (max-width: 1500px) {
+  article {
+    max-width: 105rem;
+  }
+}
+
+@media only screen and (max-width: 1400px) {
+  article{
+    max-width: 110rem;
+    margin-bottom: 6rem;
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  article {
+    max-width: 110rem;
+    margin-bottom: 5rem;
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  article {
+    display: block;
+    grid-template-columns: unset;
+    margin-bottom: 5rem;
   }
 }

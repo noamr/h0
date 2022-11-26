@@ -230,6 +230,7 @@ export async function render(response: Response, root: Element) {
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
+    movieRoot.querySelector(".artwork")!.setAttribute("src", TMDB_IMAGE_BASE_URL + "/w780" + movie.poster_path);
   }
 
   reconcileChildren<Genre>({

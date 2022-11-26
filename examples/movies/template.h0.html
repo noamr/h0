@@ -8,8 +8,8 @@
   <body>
     <header>
       <label id="hamburger">
-        <button class="hamburgerButton" tabindex="0">☰</button>
         <aside tabindex="1">
+          <a class="hamburgerButton" role="button">☰</a>
           <nav>
             <a class="logo" href="/?categpry=popular&page=1">
               <img
@@ -77,9 +77,16 @@
               </div>
             </section>
           </main>
+            <MovieInfo
+              baseUrl={baseUrl}
+              movie={movie} />
+
           <article>
-            <h1></h1>
-            <h2></h2>
+            <h1>Title</h1>
+            <h2>Tagline</h2>
+            <img class="artwork"
+              width="780"
+              height="1170">
             <h3>Genres</h3>
             <ul id="movieGenresList"></ul>
             <h3>Synopsys</h3>
