@@ -3,7 +3,7 @@ import {DOMParser} from "linkedom";
 import Express from "express";
 import {resolve} from "path";
 import { BuildOptions, buildSync } from "esbuild";
-import {rmSync, writeFileSync, readFileSync, existsSync, mkdirSync} from "fs";
+import {rmSync, writeFileSync, readFileSync, existsSync, mkdirSync, watchFile} from "fs";
 import os from "os"
 import {randomUUID} from "crypto";
 
@@ -18,6 +18,7 @@ export interface ServerOptions {
     serverSideRendering: boolean;
     additionalPublicFolders: string[];
     esbuild: BuildOptions
+    watch: boolean
 }
 
 export function routerFromFolder(folder: string, options?: ServerOptions) {
@@ -27,8 +28,23 @@ export function routerFromFolder(folder: string, options?: ServerOptions) {
     if (!existsSync(htmlFile))
        throw new Error(`Template ${htmlFile} not found`);
 
-    const templateHTML = readFileSync(htmlFile, "utf-8");
-    return router({templateHTML, indexModule, publicFolders, options});
+    const createRouter = () => {
+        const templateHTML = readFileSync(htmlFile, "utf-8");
+        return router({templateHTML, indexModule, publicFolders, options});
+    };
+
+    if (!options?.watch)
+        return createRouter();
+
+    let currentRouter = createRouter();
+    const metaRouter = Express.Router();
+    const resetRouter =  () => {
+        currentRouter = createRouter();
+    };
+    metaRouter.use((...args) => currentRouter(...args));
+    watchFile(htmlFile, resetRouter);
+    watchFile(indexModule, resetRouter);
+    return metaRouter;
 }
 
 export function router({templateHTML, indexModule, publicFolders, options}: ServerConfig) {
@@ -36,8 +52,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         throw new Error(`Module ${indexModule} not found`);
 
     const serverSideRendering = !!(options?.serverSideRendering);
-    console.log({options})
-    const spec = require(indexModule) as H0Spec;;
+    const spec = require(indexModule) as H0Spec;
 
     const scope = spec.scope || "/";
     const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);

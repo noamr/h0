@@ -23,7 +23,7 @@ Each of those functions can run on the server and/or in the browser.
 - Write your `render` function: take the `Response` you received and apply it to the DOM.
   Your `render` function should run on the client and/or the server.
 - Write your `mount` function (optionally) to add any custom event handlers.
-- If you want your app to be an SPA, import the generated bundle as an ES module.
+- If you want your app to be an SPA, import the generated bundle as an ES module. H0 will intercept your navigations.
 
 You're good to go!
 
@@ -133,13 +133,11 @@ by using CSS and web components.
 #### No "components"
 
 Since H0 relies on pure JS functions (`route` and `render`), and on raw HTML, there is no need for an additional component model.
-You can use existing JS-based modular enablers like ESM, and hTML modular enablers like web-components and the template element.
-
-
+You can use existing JS-based modular enablers like ESM, and HTML modular enablers like web-components and the template element.
 
 ### Debugging Experience (aka DX)
 
-By having no magic, the code you write is 100% the code you run, so debugging is a lot more straightforward.
+By having no magic, the code you write is 100% the code you run (well maybe except TS transpilation), so debugging is a lot more straightforward.
 And by following some design principles, you shouldn't end up with verbose or hard-to-read code.
 
 

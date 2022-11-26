@@ -8,6 +8,7 @@ const optionDefinition = [
     {name: 'dir', alias: 'd', multiple: true, defaultOption: true},
     {name: 'ssr', alias: 's', type: Boolean},
     {name: 'public', alias: 'u', multiple: true},
+    {name: 'watch', alias: 'w', type: Boolean}
 ];
 
 const runOptions = commandLineArgs(optionDefinition, process.argv);
@@ -18,7 +19,7 @@ if (!runOptions.dir?.length) {
 }
 
 for (const dir of runOptions.dir) {
-    const options = {};
+    const options = {watch: runOptions.watch};
     if (runOptions.ssr)
         options.serverSideRendering = true;
     app.use(routerFromFolder(dir, options));
