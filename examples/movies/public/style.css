@@ -610,7 +610,6 @@ nav h3:not(:first-child) {
 
 nav {
   width: 250px;
-  max-width: 70%;
   height: 100%;
   left: 0;
   top: 0;
