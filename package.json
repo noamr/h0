@@ -28,6 +28,6 @@
     "scripts": {
         "test": "playwright test --workers 1",
         "build": "esbuild src/h0-standalone.ts --outdir=dist --bundle --sourcemap=inline --target=es2022 --define:RUNTIME=window",
-        "start:dev:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json"
+        "start:dev:movies:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json"
     }
 }

@@ -8,7 +8,7 @@ Most of the CSS is copied from the above link.
 - export TMDB_API_KEY=`<your-TMDB-API-key>`
 - nvm use
 - npm i
-- Run `yarn start:dev:ssr` 
+- Run `yarn start:dev:movies:ssr` 
 - http://localhost:8000
 
 ## Principles of development
