@@ -213,25 +213,6 @@ html {
   }
 }
 
-/* large */
-@media only screen and (max-width: 1300px) {
-  html {
-    font-size: 55%;
-  }
-
-  body {
-    padding-right: 2rem;
-    padding-left: 2rem;
-  }
-}
-
-/* larger */
-@media only screen and (max-width: 1462.5px) {
-  body {
-    padding-right: 3rem;
-    padding-left: 3rem;
-  }
-}
 
 /* largest */
 @media only screen and (max-width: 1500px) {
@@ -288,11 +269,6 @@ article h2 {
 
 main > h2 {
   margin-bottom: 2rem;
-}
-
-body {
-  padding-right: 4rem;
-  padding-left: 4rem;
 }
 
 .pagination {
@@ -400,9 +376,25 @@ a svg, a img {
   pointer-events: none;
 }
 
+svg {
+  fill: currentColor;
+}
 header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  left: auto;
+  right: 0;
+  z-index: var(--z-app-bar);
+  box-shadow: var(--box-shadow-1);
+  background: var(--palette-background-default);
+  padding: 24px;
+}
+
+main {
+  padding: 0 4rem;
 }
 
 header > :not(:first-child) {
@@ -436,14 +428,7 @@ body[data-path="/movie"] article {
   }
 }
 
-@media only screen and (max-width: 1300px) {
-  main {
-    padding-top: 72px;
-    padding-bottom: 4rem;
-  }
-}
-
-.hamburgerButton {
+#hamburgerButton {
   appearance: none;
   background: none;
   border: none;
@@ -452,7 +437,48 @@ body[data-path="/movie"] article {
   line-height: 1;
   cursor: pointer;
   color: var(--palette-secondary-main);
+  visibility: hidden;
 }
+
+body {
+  display: grid;
+  grid-template-columns: minmax(0, auto) 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+header {
+  grid-area: 1 / 2 / 2 / 3;
+}
+
+nav {
+  grid-area: 1 / 1 / 3 / 2;
+}
+
+main,article {
+  grid-area: 2 / 2 / 3 / 3;
+}
+
+@media only screen and (max-width: 1000px) {
+  main {
+    padding-top: 72px;
+    padding-bottom: 4rem;
+  }
+
+  #hamburgerButton {
+    visibility: visible;
+  }
+
+  body:has(#hamburgerButton:focus) nav {
+    transform: none;
+  }
+
+  nav {
+    position: fixed;
+    transform: translateX(-100%);
+  }
+}
+
+
 
 form {
   position: relative;
@@ -474,8 +500,12 @@ form {
 #searchBox {
   background: none;
   border: none;
-  color: currentColor;
+  color: white;
   outline: none;
+}
+
+#searchBox::placeholder {
+  color: var(--palette-secondary-contrast-text);
 }
 
 form:not(:focus-within) #searchBox {
@@ -555,7 +585,7 @@ a.logo {
   margin: 16px 8px;
 }
 
-aside nav h3 {
+nav h3 {
   font-weight: var(--font-weight-bold);
   font-size: 1.25rem;
   color: var(--palette-text-primary);
@@ -564,7 +594,7 @@ aside nav h3 {
   margin: 0 0 1rem 1rem;
 }
 
-aside nav h3:not(:first-child) {
+nav h3:not(:first-child) {
   margin-top: 4rem;
 }
 
@@ -578,13 +608,13 @@ aside nav h3:not(:first-child) {
   height: 3rem;
 }
 
-aside nav {
-  position: fixed;
+nav {
   width: 250px;
   max-width: 70%;
   height: 100%;
   left: 0;
   top: 0;
+
   z-index: var(--z-drawer);
   padding: 32px 16px;
   overflow-y: auto;
@@ -592,10 +622,9 @@ aside nav {
   transition: transform var(--duration-short) var(--ease-out);
   box-shadow: var(--box-shadow-16);
   background-color: var(--palette-background-paper);
-  transform: none;
 }
 
-aside ul a {
+nav ul a {
   outline: none;
   display: block;
   margin-bottom: 0.5rem;
@@ -605,7 +634,7 @@ aside ul a {
   color: var(--palette-primary-main);
 }
 
-aside ul a:current {
+nav ul a:current {
   color: var(--palette-secondary-main);
 }
 
@@ -613,10 +642,6 @@ a:hover {
   text-decoration: underline;
 }
 
-
-#hamburger:not(:focus-within) aside nav {
-  transform: translate(-100%);
-}
 
 body:not([data-path="/movie"]) article {
   display: none;
