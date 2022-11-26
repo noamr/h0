@@ -8,7 +8,8 @@ const optionDefinition = [
     {name: 'dir', alias: 'd', multiple: true, defaultOption: true},
     {name: 'ssr', alias: 's', type: Boolean},
     {name: 'public', alias: 'u', multiple: true},
-    {name: 'watch', alias: 'w', type: Boolean}
+    {name: 'watch', alias: 'w', type: Boolean},
+    {name: 'minify', alias: 'm', type: Boolean}
 ];
 
 const runOptions = commandLineArgs(optionDefinition, process.argv);
@@ -19,9 +20,11 @@ if (!runOptions.dir?.length) {
 }
 
 for (const dir of runOptions.dir) {
-    const options = {watch: runOptions.watch};
+    const options = {watch: runOptions.watch, esbuild: {}};
     if (runOptions.ssr)
         options.serverSideRendering = true;
+    if (runOptions.minify)
+        options.esbuild.minify = true;
     app.use(routerFromFolder(dir, options));
     const {scope} = require(`${path.resolve(dir)}/index.h0.ts`);
     console.log(`H0: serving ${dir} at http://localhost:${port}${scope}`);

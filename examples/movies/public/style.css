@@ -409,6 +409,40 @@ header > :not(:first-child) {
   margin-left: 8px;
 }
 
+main, article {
+  width: 100%;
+  min-height: 100vh;
+
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+article {
+  visibility: hidden;
+}
+
+body[data-path="/movie"] main{
+  display: none;
+}
+
+body[data-path="/movie"] article {
+  visibility: visible;
+}
+
+@media only screen and (max-width: 1462.5px) {
+  .content-wrapper {
+    padding-top: 72px;
+    padding-bottom: 6rem;
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  main {
+    padding-top: 72px;
+    padding-bottom: 4rem;
+  }
+}
+
 .hamburgerButton {
   appearance: none;
   background: none;
@@ -699,5 +733,25 @@ article {
     display: block;
     grid-template-columns: unset;
     margin-bottom: 5rem;
+  }
+}
+
+#ads {
+  display: flex;
+  align-items: center;
+}
+
+.ad-section-wrapper-links {
+  display: flex;
+  margin-right: auto;
+}
+
+.ad-section-wrapper-links > *:not(:last-child) {
+  margin-right: 2rem;
+}
+
+@media only screen and (max-width: 1300px) {
+  .ad-section-wrapper-links > *:not(:last-child) {
+    margin-right: 1rem;
   }
 }
