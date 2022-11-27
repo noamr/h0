@@ -3,6 +3,8 @@
 This is a vanilla/h0 implementation of the [TasteJS movie app](https://github.com/tastejs/next-movies).
 Most of the CSS is copied from the above link.
 
+Demo: [https://h0-movies.onrender.com](https://h0-movies.onrender.com)
+
 ## To run
 - Get a [TMDB API key](https://developers.themoviedb.org/3/getting-started)
 - export TMDB_API_KEY=`<your-TMDB-API-key>`
