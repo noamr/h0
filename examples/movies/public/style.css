@@ -2,6 +2,7 @@
 @import "article.css";
 @import "nav.css";
 @import "main.css";
+@import "header.css";
 
 :root {
   --font-weight-light: 300;
@@ -293,26 +294,8 @@ a svg, a img {
 svg {
   fill: currentColor;
 }
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  left: auto;
-  right: 0;
-  z-index: var(--z-app-bar);
-  box-shadow: var(--box-shadow-1);
-  background: var(--palette-background-default);
-  padding: 24px;
-}
-
 main {
   padding: 0 4rem;
-}
-
-header > :not(:first-child) {
-  margin-left: 8px;
 }
 
 main, article {
@@ -359,88 +342,6 @@ nav {
 main,article {
   grid-area: 2 / 2 / 3 / 3;
   display: block;
-}
-
-header form {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--box-shadow-1);
-  background-color: var(--palette-secondary-dark);
-  border: 1px solid var(--palette-secondary-main);
-  padding: 2rem;
-  height: 2rem;
-  outline: none;
-  border-radius: 100px;
-  transition: width var(--duration-standard) var(--ease-in-out);
-  width: 2rem;
-  cursor: pointer;
-}
-
-#searchBox {
-  background: none;
-  border: none;
-  color: white;
-  outline: none;
-}
-
-#searchBox::placeholder {
-  color: var(--palette-secondary-contrast-text);
-}
-
-form:not(:focus-within) #searchBox {
-  display: none;
-}
-
-form:focus-within {
-  width: 30rem;
-  cursor: auto;
-}
-
-#searchSubmit {
-  pointer-events: none;
-  cursor: none;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  color: var(--palette-secondary-contrast-text);
-  display: grid;
-}
-
-#searchSubmit svg {
-  width: 1.25rem;
-}
-
-#searchBox:empty ~ #searchSubmit {
-  pointer-events: none;
-}
-
-
-form:focus-within #searchSubmit {
-  pointer-events: auto;
-  cursor: auto;
-}
-
-@media only screen and (max-width: 1300px) {
-  #searchButton {
-    font-size: 1rem;
-  }
-}
-
-
-@media only screen and (max-width: 1300px) {
-  form {
-    padding: 1.5rem;
-    border: 1px solid transparent;
-    background-color: var(--palette-secondary-main);
-  }
-}
-
-@media (max-width: 600px) {
-  form {
-    max-width: 16rem;
-  }
 }
 
 a:hover {

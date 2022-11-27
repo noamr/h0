@@ -172,6 +172,10 @@ export async function route(request: Request) : Promise<Response> {
     }
 }
 
+function imageURL(path : string | null, width : number) {
+  return path ? `/image?width=${width}&path=${path}` : '/nothing.svg';
+}
+
 export async function render(response: Response, root: Element) {
   const model = (await response.json()) as Model;
   const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
@@ -207,8 +211,6 @@ export async function render(response: Response, root: Element) {
       })
     });
 
-  console.log(model);
-
   const updateGenreLink = (li: Element, value: Genre) => {
     const a = li.querySelector("a") as HTMLAnchorElement;
     a.setAttribute("href", `/genre?id=${value.id}`);
@@ -228,7 +230,7 @@ export async function render(response: Response, root: Element) {
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
-    movieRoot.querySelector(".artwork")!.setAttribute("src", `/image?width=780&path=${movie.poster_path}`);
+    movieRoot.querySelector(".artwork")!.setAttribute("src", imageURL(movie.poster_path, 780));
   }
 
   reconcileChildren<Genre>({
@@ -248,7 +250,7 @@ export async function render(response: Response, root: Element) {
       updateItem: (element: Element, movie: Movie) => {
         element.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
-        element.querySelector(".posterImg")!.setAttribute("src", `/image?width=342&path=${movie.poster_path}`);
+        element.querySelector(".posterImg")!.setAttribute("src", imageURL(movie.poster_path, 342));
       }
     }),
     model: {
@@ -260,9 +262,6 @@ export async function render(response: Response, root: Element) {
 }
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
-  root.querySelector("form#searchForm")!.addEventListener("focus", ({target}) => {
-    ((target as HTMLFormElement).elements.namedItem("searchTerm") as HTMLInputElement).focus();
-  });
   window.addEventListener("popstate", () => h0.navigate(window.location.href, "transparent"));
   document.addEventListener("load", ({target}) => {
     const img = target as HTMLImageElement;

@@ -6,8 +6,11 @@ addEventListener("fetch", e => {
     e.respondWith((async () => {
       const width = url.searchParams.get("width");
       const path = url.searchParams.get("path");
+      if (!path || path === "null")
+        return Response.redirect("/nothing.svg");
       try {
-        return await fetch(`${TMDB_IMAGE_BASE_URL}/w${width}${path}`, {mode: "no-cors"});
+        const imageURL = `${TMDB_IMAGE_BASE_URL}/w${width}${path}`;
+        return await fetch(imageURL, {mode: "no-cors"});
       } catch (e) {
         return Response.redirect("/nothing.svg");
       }

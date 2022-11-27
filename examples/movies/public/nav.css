@@ -83,6 +83,7 @@ nav ul a:current {
   cursor: pointer;
   color: var(--palette-secondary-main);
   visibility: hidden;
+  text-decoration: none;
 }
 
 
