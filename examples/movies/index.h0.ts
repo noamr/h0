@@ -173,7 +173,8 @@ export async function route(request: Request) : Promise<Response> {
 }
 
 function imageURL(path : string | null, width : number) {
-  return path ? `/image?width=${width}&path=${path}` : '/nothing.svg';
+  const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
+  return path ? `${TMDB_IMAGE_BASE_URL}/w${width}${path}` : '/nothing.svg';
 }
 
 function ratingAsPercent(r: number) {

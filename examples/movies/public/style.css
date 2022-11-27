@@ -362,3 +362,8 @@ body[data-path="/movie"] main {
 .gradient {
   -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
 }
+
+body:not(.sw-loaded) {
+  visibility: hidden;
+  opacity: 0;
+}

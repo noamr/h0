@@ -8,7 +8,11 @@
       reasonably good experience while maintaining good developer experience.">
     <script type="module" src="./.h0/client.js"></script>
     <script>
-      navigator.serviceWorker.register("sw.js");
+      (async() => {
+        const reg = await navigator.serviceWorker.register("sw.js");
+        await reg.active;
+        document.body.classList.add("sw-loaded");
+      })();
     </script>
     <link rel="stylesheet" href="style.css">
     </head>
