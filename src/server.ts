@@ -102,6 +102,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         }
 
         res.setHeader("Content-Type", "text/html");
+        res.setHeader("Cache-Control", "no-store");
         if (!response || !render || !serverSideRendering) {
             res.send(templateHTML);
             return;
@@ -110,7 +111,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         const document = new DOMParser().parseFromString(templateHTML, "text/html");
         for (const includeElement of document.querySelectorAll("h0-include[src]") as HTMLElement[]) {
             console.log(includeElement.getAttribute("src"), fetchRequest.url);
-            const includeURL = new URL(includeElement.getAttribute("src")!, fetchRequest.url);
+            const includeURL = new URL(includeElement.getAttribute("src")!, fetchRequest .url);
             const resp = await fetch(includeURL);
             includeElement.outerHTML = await resp.text();
         }
