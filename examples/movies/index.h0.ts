@@ -269,6 +269,9 @@ export async function render(response: Response, root: Element) {
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
   window.addEventListener("popstate", () => h0.navigate(window.location.href, "transparent"));
+  root.querySelector("header form")!.addEventListener("focus", () => {
+    root.querySelector("input#searchBox")!.focus();
+  })
   document.addEventListener("load", ({target}) => {
     const img = target as HTMLImageElement;
     if (img.tagName === "IMG") {

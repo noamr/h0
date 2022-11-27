@@ -1,7 +1,7 @@
 
 header form {
   position: relative;
-  display: grid;
+  display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--box-shadow-1);
@@ -21,10 +21,7 @@ header form {
   border: none;
   color: white;
   outline: none;
-  grid-area: 1 / 1 / 2 / 2;
-  width: 100%;
   height: 100%;
-
 }
 
 #searchBox::placeholder {
@@ -32,13 +29,13 @@ header form {
 }
 
 form:not(:focus-within) #searchBox {
-  opacity: 0;
-  cursor: pointer;
+  display: none;
 }
 
 header form:focus-within {
-  width: 30rem;
-  cursor: auto;
+  width: 40rem;
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
 #searchSubmit {
@@ -48,11 +45,10 @@ header form:focus-within {
   border: none;
   outline: none;
   color: var(--palette-secondary-contrast-text);
-  width: 20px;
-  grid-area: 1 / 1 / 2 / 2;
+  width: 48px;
   align-items: stretch;
   justify-content: center;
-  width: 100%;
+  padding: 0 14px 0 14px;
 }
 
 header #searchSubmit svg {
@@ -67,7 +63,6 @@ header #searchSubmit svg {
 header form:focus-within #searchSubmit {
   pointer-events: auto;
   cursor: auto;
-  grid-area: 1 / 2 / 2 / 3;
 }
 
 @media only screen and (max-width: 1300px) {
@@ -79,7 +74,6 @@ header form:focus-within #searchSubmit {
 
 @media only screen and (max-width: 1300px) {
   form {
-    padding: 1.5rem;
     border: 1px solid transparent;
     background-color: var(--palette-secondary-main);
   }
@@ -87,7 +81,7 @@ header form:focus-within #searchSubmit {
 
 @media (max-width: 600px) {
   form {
-    max-width: 16rem;
+    max-width: 22rem;
   }
 }
 

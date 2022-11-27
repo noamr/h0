@@ -9,6 +9,7 @@
     <script type="module" src="./.h0/client.js"></script>
     <script>
       (async() => {
+        navigator.serviceWorker.ready;
         const reg = await navigator.serviceWorker.register("sw.js");
         await reg.active;
         document.body.classList.add("sw-loaded");
@@ -21,9 +22,9 @@
         <a id="hamburgerButton" role="button" tabindex="0">☰</a>
         <form id="searchForm" tabindex="1" action="/search">
           <input type="hidden" name="page" value="1">
+          <button id="searchSubmit"><h0-include src="/icons/search.svg"></h0-include></button>
           <input placeholder="Search for a Movie..." id="searchBox" type="text"
             name="searchTerm" required>
-          <button id="searchSubmit"><h0-include src="/icons/search.svg"></h0-include></button>
         </form>
       </header>
       <nav>

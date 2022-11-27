@@ -57,6 +57,7 @@ nav {
   transition: transform var(--duration-short) var(--ease-out);
   box-shadow: var(--box-shadow-16);
   background-color: var(--palette-background-paper);
+  overflow: scroll;
 }
 
 nav ul a {
@@ -86,6 +87,20 @@ nav ul a:current {
   text-decoration: none;
 }
 
+main {
+  padding: 0 4rem;
+}
+
+main, article {
+  width: 100%;
+  min-height: 100vh;
+
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+  overflow: scroll;
+  max-height: 100vh;
+}
+
 
 @media only screen and (max-width: 1000px) {
   main {
@@ -94,7 +109,7 @@ nav ul a:current {
   }
 
   main, article {
-    overflow: unset;
+    overflow: auto;
     max-height: unset;
   }
 

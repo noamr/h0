@@ -294,19 +294,6 @@ a svg, a img {
 svg {
   fill: currentColor;
 }
-main {
-  padding: 0 4rem;
-}
-
-main, article {
-  width: 100%;
-  min-height: 100vh;
-
-  padding-top: 6rem;
-  padding-bottom: 6rem;
-  overflow: scroll;
-  max-height: 100vh;
-}
 
 article {
   visibility: hidden;
