@@ -275,7 +275,6 @@ nav {
 
 main,article {
   grid-area: 2 / 2 / 3 / 3;
-  display: block;
 }
 
 a:hover {
@@ -295,7 +294,6 @@ body[data-path="/movie"] main {
   -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
 }
 
-body:not(.sw-loaded) {
-  visibility: hidden;
-  opacity: 0;
+li {
+  list-style: none;
 }

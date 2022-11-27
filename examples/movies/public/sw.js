@@ -1,7 +1,6 @@
-const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
 addEventListener("fetch", e => {
   const url = new URL(e.request.url);
-  if (url.headers["Accept"].startsWith("image/")) {
+  if (e.request.headers["Accept"].startsWith("image/")) {
     e.respondWith((async () => {
       try {
         const imageURL = `${TMDB_IMAGE_BASE_URL}/w${width}${path}`;

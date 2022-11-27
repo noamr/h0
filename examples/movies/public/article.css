@@ -8,14 +8,16 @@
 }
 
 #movieGenresList a {
-  display: flex;
-  align-items: center;
   padding: 0.5rem 0rem;
   color: var(--palette-secondary-main);
   line-height: 1;
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
+}
+
+#movieGenresList a svg{
+  width: 16px;
 }
 
 #movieGenresList a:not(:last-child) {
@@ -75,10 +77,35 @@ p {
 
 article {
   display: grid;
-  grid-template-columns: 40% 60%;
+  grid-template-columns: 40% auto auto auto;
   max-width: 120rem;
   margin: 0 auto;
   margin-bottom: 7rem;
+  align-items: flex-start;
+  justify-content: start;
+}
+
+article .artwork {
+  grid-area: 1 / 1 / 10 / 2;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 7780 / 1170;
+  object-fit: contain;
+  -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
+  align-self: start;
+  object-position: top;
+}
+
+article h1 {
+  grid-area: 1 / 2 / 2 / 4;
+}
+
+article h2 {
+  grid-area: 2 / 2 / 3 / 4;
+}
+
+article .rating {
+  grid-area: 3 / 2 / 4 / 5;
 }
 
 @media only screen and (max-width: 1500px) {
@@ -129,7 +156,3 @@ article {
   }
 }
 
-.posterImg:after {
-  content: '';
-  background: currentColor;
-}

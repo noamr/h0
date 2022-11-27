@@ -32,6 +32,7 @@ interface Movie {
   video: boolean;
   vote_average: number;
   tagline: string;
+  runtime: number;
 }
 
 interface MoviesResult {
@@ -180,6 +181,13 @@ function imageURL(path : string | null, width : number) {
 function ratingAsPercent(r: number) {
   return `${r * 10}%`;
 }
+function updateGenreLink(li: Element, value: Genre) {
+  const a = li.querySelector("a") as HTMLAnchorElement;
+  a.setAttribute("href", `/genre?id=${value.id}`);
+  a.querySelector("span")!.innerHTML = value.name;
+}
+
+const languageDisplayNames = new Intl.DisplayNames(['en'], {type: "language"});
 
 export async function render(response: Response, root: Element) {
   const model = (await response.json()) as Model;
@@ -212,28 +220,22 @@ export async function render(response: Response, root: Element) {
       model: arrayModel(movie.genres!, "id"),
       view: templateView({
         container: movieRoot.querySelector("ul#movieGenresList")!,
-        template: root.querySelector("template#listItemWithLink")!,
-        updateItem: (li: Element, value: Genre) => {
-          const a = li.querySelector("a") as HTMLAnchorElement;
-          a.setAttribute("href", `/genre?id=${value.id}`);
-          a.innerHTML = value.name;
-        }
+        template: root.querySelector("template#genreLink")!,
+        updateItem: updateGenreLink
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
     movieRoot.querySelector(".artwork")!.setAttribute("src", imageURL(movie.poster_path, 780));
+    movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
+    movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
   }
 
   reconcileChildren<Genre>({
     model: arrayModel(model.genres, "id"),
     view: templateView({
       container: root.querySelector("ul#genreList")!,
-      template: root.querySelector("template#navGenre")!,
-      updateItem: (li: Element, value: Genre) => {
-        const a = li.querySelector("a") as HTMLAnchorElement;
-        a.setAttribute("href", `/genre?id=${value.id}`);
-        a.querySelector("span")!.innerHTML = value.name;
-      }
+      template: root.querySelector("template#genreLink")!,
+      updateItem: updateGenreLink
     })
   });
 
@@ -260,7 +262,7 @@ export async function render(response: Response, root: Element) {
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
   window.addEventListener("popstate", () => h0.navigate(window.location.href, "transparent"));
   root.querySelector("header form")!.addEventListener("focus", () => {
-    root.querySelector("input#searchBox")!.focus();
+    (root.querySelector("input#searchBox")! as HTMLElement).focus();
   })
   document.addEventListener("load", ({target}) => {
     const img = target as HTMLImageElement;
