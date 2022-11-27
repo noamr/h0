@@ -102,7 +102,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         }
 
         res.setHeader("Content-Type", "text/html");
-        res.setHeader("Cache-Control", "no-store");
+        res.setHeader("Vary", "Accept, Accept-Encoding");
         if (!response || !render || !serverSideRendering) {
             res.send(templateHTML);
             return;
