@@ -87,11 +87,15 @@ nav ul a:current {
 }
 
 
-
 @media only screen and (max-width: 1000px) {
   main {
     padding-top: 72px;
     padding-bottom: 4rem;
+  }
+
+  main, article {
+    overflow: unset;
+    max-height: unset;
   }
 
   #hamburgerButton {

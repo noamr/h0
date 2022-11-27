@@ -176,6 +176,10 @@ function imageURL(path : string | null, width : number) {
   return path ? `/image?width=${width}&path=${path}` : '/nothing.svg';
 }
 
+function ratingAsPercent(r: number) {
+  return `${r * 10}%`;
+}
+
 export async function render(response: Response, root: Element) {
   const model = (await response.json()) as Model;
   const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
@@ -250,6 +254,7 @@ export async function render(response: Response, root: Element) {
       updateItem: (element: Element, movie: Movie) => {
         element.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
+        element.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
         element.querySelector(".posterImg")!.setAttribute("src", imageURL(movie.poster_path, 342));
       }
     }),

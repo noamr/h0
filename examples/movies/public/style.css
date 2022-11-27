@@ -304,6 +304,8 @@ main, article {
 
   padding-top: 6rem;
   padding-bottom: 6rem;
+  overflow: scroll;
+  max-height: 100vh;
 }
 
 article {
