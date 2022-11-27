@@ -9,9 +9,6 @@ const TMDB_API_NEW_VERSION = 4;
 const TMDB_API_BASE_URL = 'https://api.themoviedb.org';
 const TMDB_BASE_URL = 'https://www.themoviedb.org';
 
-// TODO: should fetch from TMDB configuration endpoint
-const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
-
 const categories = {
   popular: "Popular",
   upcoming: "Upcoming",
@@ -129,6 +126,7 @@ export async function route(request: Request) : Promise<Response> {
       // @ts-ignore
       return Response.json(model);
     }
+
     case "/search": {
       const result = await tmdb<MoviesResult>(`/search/movie`, {page, query: searchTerm});
 
@@ -230,7 +228,7 @@ export async function render(response: Response, root: Element) {
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
-    movieRoot.querySelector(".artwork")!.setAttribute("src", TMDB_IMAGE_BASE_URL + "/w780" + movie.poster_path);
+    movieRoot.querySelector(".artwork")!.setAttribute("src", `/image?width=780&path=${movie.poster_path}`);
   }
 
   reconcileChildren<Genre>({
@@ -250,7 +248,7 @@ export async function render(response: Response, root: Element) {
       updateItem: (element: Element, movie: Movie) => {
         element.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
-        element.querySelector(".posterImg")!.setAttribute("src", TMDB_IMAGE_BASE_URL + "/w342" + movie.poster_path);
+        element.querySelector(".posterImg")!.setAttribute("src", `/image?width=342&path=${movie.poster_path}`);
       }
     }),
     model: {
@@ -265,7 +263,14 @@ export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window:
   root.querySelector("form#searchForm")!.addEventListener("focus", ({target}) => {
     ((target as HTMLFormElement).elements.namedItem("searchTerm") as HTMLInputElement).focus();
   });
-  window.addEventListener("popstate", () => h0.navigate(window.location.href));
+  window.addEventListener("popstate", () => h0.navigate(window.location.href, "transparent"));
+  document.addEventListener("load", ({target}) => {
+    const img = target as HTMLImageElement;
+    if (img.tagName === "IMG") {
+      img.classList.add("loaded");
+    }
+  }, {capture: true});
+
 }
 
 export function selectRoot(doc: Document) { return doc.documentElement; }

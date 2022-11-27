@@ -128,3 +128,8 @@ article {
     margin-right: 1rem;
   }
 }
+
+.posterImg:after {
+  content: '';
+  background: currentColor;
+}
