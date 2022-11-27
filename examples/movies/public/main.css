@@ -87,7 +87,7 @@ a.poster h3 {
 }
 
 .posterImg:not(.loaded) {
-  background: url("/loading.svg");
+  background: url("/icons/loading.svg");
   background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: 50% 50%;

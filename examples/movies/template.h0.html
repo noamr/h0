@@ -3,27 +3,24 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
-    <meta name="description" content="A non-trivial Movies learning application buuilt without a framework, to show developers how they can deliver reasonably good experience while maintaining good developer experience.">
+    <meta name="description" content="A non-trivial Movies learning application
+      buuilt without a framework, to show developers how they can deliver
+      reasonably good experience while maintaining good developer experience.">
     <script type="module" src="./.h0/client.js"></script>
     <script>
       navigator.serviceWorker.register("sw.js");
     </script>
     <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <header>
-      <a id="hamburgerButton" role="button" tabindex="0">☰</a>
-      <form id="searchForm" tabindex="1" action="/search">
-        <input type="hidden" name="page" value="1">
-        <input placeholder="Search for a Movie..." id="searchBox" type="text" name="searchTerm" required>
-        <button id="searchSubmit"><svg xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 512 512"><path d="M505 442.7L405.3
-              343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1
-              322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4
-              128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9
-              0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7
-              0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128
-              0 70.7-57.2 128-128 128z"/></svg></button>
+    <webc-include src="icons.webc">
+    </head>
+    <body>
+      <header>
+        <a id="hamburgerButton" role="button" tabindex="0">☰</a>
+        <form id="searchForm" tabindex="1" action="/search">
+          <input type="hidden" name="page" value="1">
+          <input placeholder="Search for a Movie..." id="searchBox" type="text"
+            name="searchTerm" required>
+          <button id="searchSubmit"><h0-include src="/icons/search.svg"></h0-include></button>
         </form>
       </header>
       <nav>
@@ -32,7 +29,7 @@
             class='logo-img'
             width='150'
             height='150'
-            src='/logo.svg'
+            src='/icons/logo.svg'
             alt='movie ticket' />
         </a>
         <H3>Discover</H3>
@@ -40,9 +37,9 @@
         <H3>Genres</H3>
         <ul id="genreList"></ul>
         <picture class='tmdb-mark'>
-          <source srcset="/tmdbgreen.svg"
+          <source srcset="/icons/tmdbgreen.svg"
             media="(prefers-color-scheme: dark)" />
-          <source srcset="/tmdb.svg"
+          <source srcset="/icons/tmdb.svg"
             media='(prefers-color-scheme: light)' />
           <img
             width='300'
@@ -51,56 +48,44 @@
             src='' />
         </picture>
       </nav>
-    <main>
+      <main>
         <h1>Title</h1>
         <h2>Subtitle</h2>
         <section id="movies">
           <ul id="movieList">
           </ul>
           <div class="pagination">
-            <a href="#" id="prev">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path
-                  d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7
-                  273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9
-                  0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24
-                  10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3
-                  10 24.8.4 34.3z"/></svg>
-              </a>
-              <a href="#" id="next">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path
-                    d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4
-                    9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9
-                    0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3
-                    0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9
-                    101.2c-9.8-9.3-10-24.8-.4-34.3z"/></svg></a>
-              </div>
-            </section>
-          </main>
-          <article>
-            <h1>Title</h1>
-            <h2>Tagline</h2>
-            <img class="artwork gradient"
-              width="780"
-              height="1170">
-            <h3>Genres</h3>
-            <ul id="movieGenresList"></ul>
-            <h3>Synopsys</h3>
-            <p id="synopsys"></p>
-            <section id="ads">
-              <a id="imdb" href="#">#</a>
-              <a id="website" href="#">#</a>
-            </section>
-          </article>
-          <template id="movieTemplate">
-            <a href="#" class="poster">
-              <img class="posterImg gradient" width="230" height="345" loading="lazy">
-              <h3 class="movieTitle">Movie Title</h3>
-              <section class="rating">
-              </section>
-            </a>
-          </template>
-          <template id="listItemWithLink">
-            <ul><a href="#"></a></ul>
-          </template>
-        </body>
-      </html>
+            <a href="#" id="prev"><h0-include src="icons/prev.svg"></h0-include></a>
+            <a href="#" id="next"><h0-include src="icons/next.svg"></h0-include></a>
+          </div>
+        </section>
+      </main>
+      <article>
+        <h1>Title</h1>
+        <h2>Tagline</h2>
+        <img class="artwork gradient"
+          width="780"
+          height="1170">
+        <h3>Genres</h3>
+        <ul id="movieGenresList"></ul>
+        <h3>Synopsys</h3>
+        <p id="synopsys"></p>
+        <section id="ads">
+          <a id="imdb" href="#">#</a>
+          <a id="website" href="#">#</a>
+        </section>
+      </article>
+      <template id="movieTemplate">
+        <a href="#" class="poster">
+          <img class="posterImg gradient" width="230" height="345"
+            loading="lazy">
+          <h3 class="movieTitle">Movie Title</h3>
+          <section class="rating">
+          </section>
+        </a>
+      </template>
+      <template id="listItemWithLink">
+        <ul><a href="#"></a></ul>
+      </template>
+    </body>
+  </html>

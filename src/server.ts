@@ -108,6 +108,13 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         }
 
         const document = new DOMParser().parseFromString(templateHTML, "text/html");
+        for (const includeElement of document.querySelectorAll("h0-include[src]") as HTMLElement[]) {
+            console.log(includeElement.getAttribute("src"), fetchRequest.url);
+            const includeURL = new URL(includeElement.getAttribute("src")!, fetchRequest.url);
+            const resp = await fetch(includeURL);
+            includeElement.outerHTML = await resp.text();
+        }
+
         const rootElement = selectRoot(document as any as Document);
         await render(response, rootElement as HTMLElement);
         res.send(document.toString());
