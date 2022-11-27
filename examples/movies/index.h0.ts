@@ -203,24 +203,6 @@ export async function render(response: Response, root: Element) {
     nextButton.setAttribute("href", next.href);
   if (prev)
     prevButton.setAttribute("href", prev.href);
-  reconcileChildren({
-      model: objectModel(categories),
-      view: templateView({
-        container: root.querySelector("ul#categoryList")!,
-        template: root.querySelector("template#listItemWithLink")!,
-        updateItem: (li: Element, value: string, key: string) => {
-          const a = li.querySelector("a") as HTMLAnchorElement;
-          a.setAttribute("href", `/?category=${key}`);
-          a.innerHTML = value;
-        }
-      })
-    });
-
-  const updateGenreLink = (li: Element, value: Genre) => {
-    const a = li.querySelector("a") as HTMLAnchorElement;
-    a.setAttribute("href", `/genre?id=${value.id}`);
-    a.innerHTML = value.name;
-  };
 
   if (movie) {
     const movieRoot = root.querySelector("article")!;
@@ -231,7 +213,11 @@ export async function render(response: Response, root: Element) {
       view: templateView({
         container: movieRoot.querySelector("ul#movieGenresList")!,
         template: root.querySelector("template#listItemWithLink")!,
-        updateItem: updateGenreLink
+        updateItem: (li: Element, value: Genre) => {
+          const a = li.querySelector("a") as HTMLAnchorElement;
+          a.setAttribute("href", `/genre?id=${value.id}`);
+          a.innerHTML = value.name;
+        }
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
@@ -242,8 +228,12 @@ export async function render(response: Response, root: Element) {
     model: arrayModel(model.genres, "id"),
     view: templateView({
       container: root.querySelector("ul#genreList")!,
-      template: root.querySelector("template#listItemWithLink")!,
-      updateItem: updateGenreLink
+      template: root.querySelector("template#navGenre")!,
+      updateItem: (li: Element, value: Genre) => {
+        const a = li.querySelector("a") as HTMLAnchorElement;
+        a.setAttribute("href", `/genre?id=${value.id}`);
+        a.querySelector("span")!.innerHTML = value.name;
+      }
     })
   });
 

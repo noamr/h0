@@ -1,15 +1,9 @@
 
 a.logo {
-  width: 100%;
-  height: 18rem;
+  max-width: 75%;
   display: grid;
   place-items: center;
-  margin-bottom: 2rem;
   outline: none;
-}
-
-.logo-img {
-  max-width: 75%;
 }
 
 .copyright {
@@ -31,7 +25,7 @@ nav h3 {
   margin: 0 0 1rem 1rem;
 }
 
-nav h3:not(:first-child) {
+nav h3:not(:first-of-type) {
   margin-top: 4rem;
 }
 
@@ -57,17 +51,26 @@ nav {
   transition: transform var(--duration-short) var(--ease-out);
   box-shadow: var(--box-shadow-16);
   background-color: var(--palette-background-paper);
-  overflow: scroll;
 }
 
-nav ul a {
+nav ul {
   outline: none;
   display: block;
-  margin-bottom: 0.5rem;
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   line-height: 1;
+  list-style: none;
+}
+
+nav ul a {
   color: var(--palette-primary-main);
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.2rem;
+}
+
+nav ul a svg {
+  width: 16px;
 }
 
 nav ul a:current {
@@ -117,7 +120,7 @@ main, article {
     visibility: visible;
   }
 
-  body:has(#hamburgerButton:focus) nav {
+  body:has(#hamburgerButton:focus) nav, nav:focus-within {
     transform: none;
   }
 
