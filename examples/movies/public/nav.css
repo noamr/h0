@@ -95,9 +95,6 @@ main {
 }
 
 main, article {
-  width: 100%;
-  min-height: 100vh;
-
   padding-top: 6rem;
   padding-bottom: 6rem;
   overflow: scroll;

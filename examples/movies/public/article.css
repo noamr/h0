@@ -78,35 +78,74 @@ p {
 article {
   display: grid;
   grid-template-columns: 40% auto auto auto;
+  grid-template-rows: repeat(8, max-content);
   max-width: 120rem;
-  margin: 0 auto;
+  margin: 0 4rem;
   margin-bottom: 7rem;
   align-items: flex-start;
   justify-content: start;
 }
 
 article .artwork {
-  grid-area: 1 / 1 / 10 / 2;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 7780 / 1170;
+  grid-area: 1 / 1 / 9 / 2;
   object-fit: contain;
   -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
   align-self: start;
   object-position: top;
+  padding-top: 0;
+  width: 100%;
+  height: auto;
 }
 
 article h1 {
-  grid-area: 1 / 2 / 2 / 4;
+  grid-area: 1 / 2 / 2 / 6;
 }
 
 article h2 {
-  grid-area: 2 / 2 / 3 / 4;
+  grid-area: 2 / 2 / 3 / 6;
 }
 
 article .rating {
-  grid-area: 3 / 2 / 4 / 5;
+  grid-area: 3 / 2 / 4 / 3;
 }
+
+article #additionalInfo {
+  grid-area: 3 / 5 / 4 / 6;
+  color: var(--palette-warning-light);
+  font-size: 1.4rem;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+article h3:nth-of-type(1) {
+  grid-area: 4 / 2 / 5 / 2;
+}
+
+article #movieGenresList {
+  grid-area: 5 / 2 / 6 / 6;
+}
+
+article h3:nth-of-type(2) {
+  grid-area: 6 / 2 / 7 / 4;
+}
+
+p#synopsys {
+  grid-area: 7 / 2 / 8 / 6;
+  padding-right: 4rem;
+}
+
+article h3:nth-of-type(3) {
+  grid-area: 8 / 2 / 9 / 6;
+}
+
+article section#cast {
+  grid-area: 9 / 2 / 10 / 6;
+}
+
+article #ads {
+  grid-area: 10 / 2 / 11 / 3;
+}
+
 
 @media only screen and (max-width: 1500px) {
   article {
@@ -139,6 +178,7 @@ article .rating {
 #ads {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .ad-section-wrapper-links {
@@ -156,3 +196,23 @@ article .rating {
   }
 }
 
+#ads a[href=""] {
+  display: none;
+}
+
+#ads a {
+  padding: 6px 16px;
+  color: var(--palette-primary-main);
+  font-size: 1.5rem;
+  display: flex;
+  border: 1px solid currentColor;
+  min-width: 96px;
+  min-height: 48px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+#ads a svg {
+  height: 1.5rem;
+  margin-left: 1rem;
+}

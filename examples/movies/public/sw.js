@@ -1,13 +1,16 @@
 addEventListener("fetch", e => {
-  const url = new URL(e.request.url);
-  if (e.request.headers["Accept"].startsWith("image/")) {
-    e.respondWith((async () => {
-      try {
-        const imageURL = `${TMDB_IMAGE_BASE_URL}/w${width}${path}`;
-        return await fetch(imageURL, {mode: "no-cors"});
-      } catch (e) {
-        return Response.redirect("/nothing.svg");
-      }
-    })());
-  }
+  if (e.request.destination !== "image" ||   // Only do this when requesting an image
+    request.mode === "no-cors") // We don't know the status of no-cors images
+    return;
+
+  e.respondWith((async () => {
+    try {
+      const response = await fetch(e.request);
+      if (response.ok)
+        return response;
+    } catch {
+    }
+    return Response.redirect("/nothing.svg");
+  })());
+
 });

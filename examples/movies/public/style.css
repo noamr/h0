@@ -291,7 +291,7 @@ body[data-path="/movie"] main {
 }
 
 .gradient {
-  -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
+-webkit-mask-image: linear-gradient(white 68%, transparent 100%);
 }
 
 li {

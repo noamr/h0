@@ -33,6 +33,9 @@ interface Movie {
   vote_average: number;
   tagline: string;
   runtime: number;
+  imdb_id: string;
+  homepage: string;
+  trailer: string;
 }
 
 interface MoviesResult {
@@ -213,6 +216,7 @@ export async function render(response: Response, root: Element) {
     prevButton.setAttribute("href", prev.href);
 
   if (movie) {
+    console.log(movie)
     const movieRoot = root.querySelector("article")!;
     movieRoot.querySelector("h1")!.innerHTML = movie.title;
     movieRoot.querySelector("h2")!.innerHTML = movie.tagline;
@@ -228,6 +232,9 @@ export async function render(response: Response, root: Element) {
     movieRoot.querySelector(".artwork")!.setAttribute("src", imageURL(movie.poster_path, 780));
     movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
     movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
+    movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
+    movieRoot.querySelector("a#website")!.setAttribute("href", movie.homepage || "");
+    movieRoot.querySelector("a#trailer")!.setAttribute("href", movie.trailer || "");
   }
 
   reconcileChildren<Genre>({
