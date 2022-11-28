@@ -107,6 +107,7 @@ article h2 {
 
 article .rating {
   grid-area: 3 / 2 / 4 / 3;
+  justify-self: start;
 }
 
 article #additionalInfo {
