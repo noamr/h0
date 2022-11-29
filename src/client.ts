@@ -1,10 +1,9 @@
 import {H0Spec, HistoryMode} from "./h0";
 
 export function initClient(spec: H0Spec, context: Window = window) {
-    const route = spec.route || ((r: RequestInfo) => fetch(r));
     const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
     const scope = spec.scope || "/";
-    const {render, mount} = spec;
+    const {renderView, mount, fetchModel} = spec;
     const rootElement = selectRoot(document);
     if (!rootElement)
         throw new Error(`Root element not found`);
@@ -29,7 +28,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
         if (!pathname.startsWith(scope))
             return false;
 
-        route(req).then(async (response: Response | null) => {
+        fetchModel(req).then(async (response: Response | null) => {
             if (!response) {
                 location.href = req.url;
                 return;
@@ -37,7 +36,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
 
             switch (response.status) {
             case 200:
-                render(response, selectRoot(context.document) as HTMLElement);
+                renderView(response, selectRoot(context.document) as HTMLElement);
                 switch (historyMode) {
                     case "push":
                         context.history.pushState(null, "", req.url);

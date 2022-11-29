@@ -10,7 +10,7 @@ Write the same minimal JS to update your view, run it in node and in the browser
 ## The Concept
 
 Your view is an HTML file. You can consider it as a "master" HTML file, or the template.
-You fill it with data using two functions: `route` and `render`.
+You fill it with data using two functions: `fetchModel` and `renderView`.
 Each of those functions can run on the server and/or in the browser.
 
 ### How it works
@@ -18,10 +18,10 @@ Each of those functions can run on the server and/or in the browser.
 - Choose the root URL path of your app (e.g. `/my-app/`)
 - Build a standard HTML file with your view in it.
 - Choose the root element of your view in your HTML file. By default it would be the document (`HTML`) element.
-- Write your `route` function: handle any `Request` that matches the root URL path, returning a `Response` with your view-model.
-  Your `route` function should run on the server and/or the client.
-- Write your `render` function: take the `Response` you received and apply it to the DOM.
-  Your `render` function should run on the client and/or the server.
+- Write your `fetchModel` function: handle any `Request` that matches the root URL path, returning a `Response` with your view-model.
+  Your `fetchModel` function should run on the server and/or the client.
+- Write your `renderView` function: take the `Response` you received and apply it to the DOM.
+  Your `renderView` function should run on the client and/or the server.
 - Write your `mount` function (optionally) to add any custom event handlers.
 - If you want your app to be an SPA, import the generated bundle as an ES module. H0 will intercept your navigations.
 
@@ -45,7 +45,7 @@ export const scope = "/hello/";
 
 // Turn an HTTP-like request into a model wrapped an HTTP-like response
 // This runs on the server or in the browser
-export async function route(request: Request) {
+export async function fetchModel(request: Request) {
     return Response.json({text: "Hello World"});
 }
 
@@ -57,7 +57,7 @@ export function selectRoot(doc: Document) {
 
 // Apply the HTTP-like response into an existing DOM
 // This runs once on the server and/or multiple times in the browser!
-export async function render(response: Response, view: Element) {
+export async function renderView(response: Response, view: Element) {
     const {text} = await response.json();
     view.querySelector("#out").innerHTML = text;
 }
@@ -132,7 +132,7 @@ by using CSS and web components.
 
 #### No "components"
 
-Since H0 relies on pure JS functions (`route` and `render`), and on raw HTML, there is no need for an additional component model.
+Since H0 relies on pure JS functions (`fetchModel` and `renderView`), and on raw HTML, there is no need for an additional component model.
 You can use existing JS-based modular enablers like ESM, and HTML modular enablers like web-components and the template element.
 
 ### Debugging Experience (aka DX)
@@ -153,4 +153,4 @@ See `examples/todo-mvc`
 
 * Interactions are (predominantly) forms and links (`<a href>`).
 * "Write" actions are different POST paths, like a standard multi-page web application
-* The `render` function updates the view based on the list of tasks, with the special `reconcileChildren` function to efficiently map the task list to the DOM.
+* The `renderView` function updates the view based on the list of tasks, with the special `reconcileChildren` function to efficiently map the task list to the DOM.

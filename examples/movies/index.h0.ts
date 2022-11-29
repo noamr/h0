@@ -67,11 +67,7 @@ interface Model {
 export const scope = "/";
 
 let genres = null as null | Promise<Genre[]>;
-export async function route(request: Request) : Promise<Response> {
-  if (RUNTIME === "window") {
-    return fetch(request);
-  }
-
+export async function fetchModel(request: Request) : Promise<Response> {
   const {TMDB_API_KEY} = process.env;
   if (!TMDB_API_KEY) {
     throw new Error('Missing TMDB_API_KEY in env');
@@ -176,6 +172,8 @@ export async function route(request: Request) : Promise<Response> {
     }
 }
 
+fetchModel.runtime = "server-only";
+
 function imageURL(path : string | null, width : number) {
   const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
   return path ? `${TMDB_IMAGE_BASE_URL}/w${width}${path}` : '/nothing.svg';
@@ -192,7 +190,7 @@ function updateGenreLink(li: Element, value: Genre) {
 
 const languageDisplayNames = new Intl.DisplayNames(['en'], {type: "language"});
 
-export async function render(response: Response, root: Element) {
+export async function renderView(response: Response, root: Element) {
   const model = (await response.json()) as Model;
   const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
   const urlRecord = new URL(url);

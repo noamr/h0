@@ -8,7 +8,7 @@ interface Model {
     rates: {[key: string]: number}
 }
 
-export async function render(response: Response, root: HTMLElement) {
+export async function renderView(response: Response, root: HTMLElement) {
     const {from, to, symbols, rates} = await response.json() as Model;
     console.log({from, to, symbols, rates} );
     root.querySelector("#from")!.innerHTML = from;
@@ -25,7 +25,7 @@ export async function render(response: Response, root: HTMLElement) {
     });
 }
 
-export async function route() : Promise<Response> {
+export async function fetchModel() : Promise<Response> {
     return new Response(JSON.stringify({rates: {USD: 1, GBP: 2}, symbols: {USD: "US Dollar $", GBP: "Brittish Pound"}, from: "USD", to: "GBP"}), {headers: {"Content-Type": "application/json"}});
 }
 

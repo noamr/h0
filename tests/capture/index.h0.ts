@@ -3,7 +3,7 @@ interface Model {
     method: string
 };
 
-export async function render(response: Response, root: HTMLElement) {
+export async function renderView(response: Response, root: HTMLElement) {
     const {path, method} = await response.json() as Model;
     root.querySelector("output#path")!.innerHTML = path;
     root.querySelector("output#method")!.innerHTML = method;
@@ -12,7 +12,7 @@ export async function render(response: Response, root: HTMLElement) {
     outRenders.innerHTML = "" + (renders + 1);
 }
 
-export async function route(req: Request) : Promise<Response> {
+export async function fetchModel(req: Request) : Promise<Response> {
     const path = new URL(req.url).pathname;
     const method = req.method;
     return new Response(JSON.stringify({path, method}));
@@ -21,3 +21,5 @@ export async function route(req: Request) : Promise<Response> {
 export function selectRoot(doc: Document) { return doc.querySelector("main") as Element; }
 
 export const scope = "/capture/";
+
+export function mount() {}

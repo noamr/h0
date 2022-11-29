@@ -15,7 +15,7 @@ interface Model {
 
 export const scope = "/todos/";
 
-export async function route(request: Request) : Promise<Response> {
+export async function fetchModel(request: Request) : Promise<Response> {
     // As per spec, get the stored list
     const fromStorage = (typeof localStorage === "undefined") ? [] : JSON.parse(localStorage.getItem("todos") || "[]");
     const tasks = new Map<string, Task>(fromStorage);
@@ -74,7 +74,9 @@ export async function route(request: Request) : Promise<Response> {
     }
 }
 
-export async function render(response: Response, root: Element) {
+fetchModel.runtime = "client-only";
+
+export async function renderView(response: Response, root: Element) {
     const document = root.ownerDocument;
 
     const {tasks} = (await response.json()) as Model;

@@ -57,7 +57,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
     const scope = spec.scope || "/";
     const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
 
-    const {route, render} = spec;
+    const {fetchModel, renderView} = spec;
     const expressRouter = Express.Router();
     for (const publicFolder of publicFolders.filter(existsSync))
         expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));
@@ -65,10 +65,12 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
     const tmpdir = `${os.tmpdir}/h0-${randomUUID()}`;
     const tmp = `${os.tmpdir}/h0-${randomUUID()}.ts`;
     mkdirSync(tmpdir);
+    const fetchModelOnClient = fetchModel.runtime !== "server-only";
+    const fetchModelOnServer = fetchModel.runtime !== "client-only";
     writeFileSync(tmp, `
         import {initClient} from "${resolve(__dirname, "client.ts")}";
-        import * as spec from "${indexModule}";
-        initClient(spec);
+        import {renderView, scope, mount, selectRoot${fetchModelOnClient ? ", fetchModel" : ""}} from "${indexModule}";
+        initClient({scope, selectRoot, mount, fetchModel : ${fetchModelOnClient ? "fetchModel" : "fetch"}, renderView});
     `);
 
     buildSync({
@@ -87,7 +89,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         const accept = req.headers["accept"];
         const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
         globalThis.RUNTIME = "node";
-        const response = await route?.(fetchRequest);
+        const response = await fetchModel?.(fetchRequest);
         if (response) {
             for (const [h, v] of response.headers.entries())
                 res.setHeader(h, v);
@@ -103,7 +105,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
 
         res.setHeader("Content-Type", "text/html");
         res.setHeader("Vary", "Accept, Accept-Encoding");
-        if (!response || !render || !serverSideRendering) {
+        if (!response || !renderView || !serverSideRendering || !fetchModelOnServer) {
             res.send(templateHTML);
             return;
         }
@@ -117,7 +119,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         }
 
         const rootElement = selectRoot(document as any as Document);
-        await render(response, rootElement as HTMLElement);
+        await renderView(response, rootElement as HTMLElement);
         res.send(document.toString());
     });
 

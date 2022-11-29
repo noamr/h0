@@ -6,7 +6,7 @@ interface Model {
     runtime: string
 };
 
-export async function render(response: Response, root: HTMLElement) {
+export async function renderView(response: Response, root: HTMLElement) {
     const {text, list, runtime} = await response.json() as Model;
     root.querySelector("output#text")!.innerHTML = text;
     root.querySelector("span.runtime")!.innerHTML = runtime;
@@ -21,7 +21,7 @@ export async function render(response: Response, root: HTMLElement) {
     })
 }
 
-export async function route() : Promise<Response> {
+export async function fetchModel() : Promise<Response> {
     return new Response(JSON.stringify({text:  "Text from model", runtime: typeof window === "undefined" ? "node" : "client", list: {a: "A", b: "B"}}));
 }
 
