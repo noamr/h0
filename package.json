@@ -7,6 +7,7 @@
         "command-line-args": "^5.2.1",
         "esbuild": "^0.15.10",
         "express": "^4.18.2",
+        "fs-extra": "^11.1.0",
         "linkedom": "^0.14.17",
         "typescript": "^4.8.4"
     },
@@ -27,7 +28,7 @@
     },
     "scripts": {
         "test": "playwright test --workers 1",
-        "build": "esbuild src/h0-standalone.ts --outdir=dist --bundle --sourcemap=inline --target=es2022 --define:RUNTIME=window",
-        "start:dev:movies:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json"
+        "build:vercel:movies": "node ./build-vercel.js --ssr ./examples/movies --out .vercel/movies",
+        "start:dev:movies:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json,html"
     }
 }

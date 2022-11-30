@@ -1,5 +1,5 @@
 const express = require("express");
-const routerFromFolder = require("./index");
+const {routerFromFolder} = require("./index");
 const app = express();
 const path = require("path");
 const commandLineArgs = require('command-line-args');

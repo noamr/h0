@@ -1,9 +1,9 @@
 import {H0Spec} from "./h0";
-import {DOMParser} from "linkedom";
 import Express from "express";
-import {resolve} from "path";
-import { BuildOptions, buildSync } from "esbuild";
-import {rmSync, writeFileSync, readFileSync, existsSync, mkdirSync, watchFile} from "fs";
+import {resolve, dirname} from "path";
+import { BuildOptions } from "esbuild";
+import {readFileSync, existsSync, mkdirSync} from "fs";
+import { buildClientBundle, resolveIncludes, createServeFunction } from "./build";
 import os from "os"
 import {randomUUID} from "crypto";
 
@@ -28,99 +28,50 @@ export function routerFromFolder(folder: string, options?: ServerOptions) {
     if (!existsSync(htmlFile))
        throw new Error(`Template ${htmlFile} not found`);
 
-    const createRouter = () => {
-        const templateHTML = readFileSync(htmlFile, "utf-8");
-        return router({templateHTML, indexModule, publicFolders, options});
-    };
-
-    if (!options?.watch)
-        return createRouter();
-
-    let currentRouter = createRouter();
-    const metaRouter = Express.Router();
-    const resetRouter =  () => {
-        currentRouter = createRouter();
-    };
-    metaRouter.use((...args) => currentRouter(...args));
-    watchFile(htmlFile, resetRouter);
-    watchFile(indexModule, resetRouter);
-    return metaRouter;
+    const templateHTML = readFileSync(htmlFile, "utf-8");
+    return router({templateHTML, indexModule, publicFolders, options});
 }
 
 export function router({templateHTML, indexModule, publicFolders, options}: ServerConfig) {
     if (!existsSync(indexModule))
-        throw new Error(`Module ${indexModule} not found`);
+        throw new Error(`Module ${indexModule} not found`);''
 
     const serverSideRendering = !!(options?.serverSideRendering);
     const spec = require(indexModule) as H0Spec;
 
     const scope = spec.scope || "/";
-    const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
 
-    const {fetchModel, renderView} = spec;
+    const serve = createServeFunction(spec, resolveIncludes(templateHTML, dirname(indexModule)), {serverSideRendering});
+
     const expressRouter = Express.Router();
     for (const publicFolder of publicFolders.filter(existsSync))
         expressRouter.use(scope, Express.static(publicFolder, {fallthrough: true}));
 
     const tmpdir = `${os.tmpdir}/h0-${randomUUID()}`;
-    const tmp = `${os.tmpdir}/h0-${randomUUID()}.ts`;
     mkdirSync(tmpdir);
-    const fetchModelOnClient = fetchModel.runtime !== "server-only";
-    const fetchModelOnServer = fetchModel.runtime !== "client-only";
-    writeFileSync(tmp, `
-        import {initClient} from "${resolve(__dirname, "client.ts")}";
-        import {renderView, scope, mount, selectRoot${fetchModelOnClient ? ", fetchModel" : ""}} from "${indexModule}";
-        initClient({scope, selectRoot, mount, fetchModel : ${fetchModelOnClient ? "fetchModel" : "fetch"}, renderView});
-    `);
-
-    buildSync({
-        entryPoints: [tmp], bundle: true, sourcemap: "linked", format: "esm", target: "chrome108", outfile: resolve(tmpdir, "client.js"),
-        define: {RUNTIME: "\"window\""}, ...options?.esbuild});
-    rmSync(tmp);
+    buildClientBundle(indexModule, tmpdir, options?.esbuild);
 
     expressRouter.use(resolve(scope, ".h0"), Express.static(tmpdir, {fallthrough: true}));
 
     expressRouter.use(async (req: Express.Request, res: Express.Response, next: () => void) => {
-        if (!req.path.startsWith(scope)) {
+        const headers = new Headers;
+        for (const header in req.headers)
+            headers.set(header, req.headers[header] as string);
+        const fetchRequest = new Request(new URL(req.url, `${req.protocol}://${req.headers.host}`), {method: req.method, body: req.body, headers});
+        const url = new URL(fetchRequest.url);
+        if (!url.pathname.startsWith(scope)) {
             next();
             return;
         }
 
-        const accept = req.headers["accept"];
-        const fetchRequest = new Request(new URL(req.url, "http://" + req.headers.host), {method: req.method, body: req.body});
-        globalThis.RUNTIME = "node";
-        const response = await fetchModel?.(fetchRequest);
-        if (response) {
-            for (const [h, v] of response.headers.entries())
-                res.setHeader(h, v);
+        const response = await serve(fetchRequest);
+        if (response.status === 200)
+            res.send(await response.text());
+        else {
+            res.sendStatus(response.status);
+            for (const [header, value] of response.headers)
+                res.setHeader(header, value);
         }
-
-        if (!accept?.includes("text/html")) {
-            if (response)
-                res.send(await response.text());
-            else
-                next();
-            return;
-        }
-
-        res.setHeader("Content-Type", "text/html");
-        res.setHeader("Vary", "Accept, Accept-Encoding");
-        if (!response || !renderView || !serverSideRendering || !fetchModelOnServer) {
-            res.send(templateHTML);
-            return;
-        }
-
-        const document = new DOMParser().parseFromString(templateHTML, "text/html");
-        for (const includeElement of document.querySelectorAll("h0-include[src]") as HTMLElement[]) {
-            console.log(includeElement.getAttribute("src"), fetchRequest.url);
-            const includeURL = new URL(includeElement.getAttribute("src")!, fetchRequest .url);
-            const resp = await fetch(includeURL);
-            includeElement.outerHTML = await resp.text();
-        }
-
-        const rootElement = selectRoot(document as any as Document);
-        await renderView(response, rootElement as HTMLElement);
-        res.send(document.toString());
     });
 
     return expressRouter;

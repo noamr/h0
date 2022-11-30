@@ -1,10 +1,9 @@
 import {H0Spec, HistoryMode} from "./h0";
 
 export function initClient(spec: H0Spec, context: Window = window) {
-    const selectRoot = spec.selectRoot || ((d: Document) => d.documentElement);
     const scope = spec.scope || "/";
-    const {renderView, mount, fetchModel} = spec;
-    const rootElement = selectRoot(document);
+    const {renderView, mount, fetchModel, selectRoot} = spec;
+    const rootElement = selectRoot?.(document) || document.documentElement;
     if (!rootElement)
         throw new Error(`Root element not found`);
 
