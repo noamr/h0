@@ -1091,6 +1091,11 @@
     "@types/mime" "*"
     "@types/node" "*"
 
+"@vercel/edge@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@vercel/edge/-/edge-0.1.2.tgz#30905f6e1069a70fd9ba0ef0ba20161cbe6585ed"
+  integrity sha512-NmoJ4JvF2/LxU8e8fRJcxaMrO9A8a2WmW6CO9GEomlDltlREyQTUWMk13BuCDDpXUPcSBDrZ2TJIoWiFQEI4sg==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"

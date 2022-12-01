@@ -18,6 +18,7 @@
         "@babel/register": "^7.18.9",
         "@playwright/test": "^1.27.1",
         "@types/express": "^4.17.14",
+        "@vercel/edge": "^0.1.2",
         "find-free-port": "^2.0.0",
         "nodemon": "^2.0.20",
         "playwright": "^1.27.1",
@@ -28,7 +29,7 @@
     },
     "scripts": {
         "test": "playwright test --workers 1",
-        "build:vercel:movies": "node ./build-vercel.js --ssr ./examples/movies --out .vercel/movies",
+        "build:vercel:movies": "node ./build-vercel.js --ssr ./examples/movies --out dist/vercel-movies --minify --name h0-movies",
         "start:dev:movies:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json,html"
     }
 }

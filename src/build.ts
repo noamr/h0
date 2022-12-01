@@ -38,31 +38,7 @@ export function resolveIncludes(templateHTML: string, templateRoot: string) {
   return document.toString();
 }
 
-export function createServeFunction(spec: H0Spec, templateHTML: string, {serverSideRendering}: {serverSideRendering: boolean}) {
-  return async function serve(req: Request): Promise<Response> {
-      const {fetchModel, renderView} = spec;
-      const accept = req.headers.get("accept") || "*/*";
-      globalThis.RUNTIME = "node";
-      const response = await fetchModel(req);
-
-      if (!response)
-          return new Response("Could not fetch model", {status: 500});
-
-      if (!accept.includes("text/html"))
-          return response;
-
-      if (!response || !renderView || !serverSideRendering || fetchModel.runtime === "client-only")
-          return new Response(templateHTML);
-
-      const document = new DOMParser().parseFromString(templateHTML, "text/html");
-      const rootElement = spec.selectRoot?.(document as any as Document) || document.documentElement;
-      await renderView(response, rootElement as HTMLElement);
-      return new Response(document.toString());
-  }
-}
-
-
-export function buildServerBundle(folder: string, outDir: string,{serverSideRendering, buildOptions}: {serverSideRendering: boolean, buildOptions?: BuildOptions}) {
+export function buildVercelMiddleware(folder: string, outFile: string,{serverSideRendering, buildOptions}: {serverSideRendering: boolean, buildOptions?: BuildOptions}) {
   const indexModule = resolve(folder, "index.h0.ts");
   const spec = require(indexModule) as H0Spec;
   const template = readFileSync(resolve(folder, "template.h0.html"), "utf-8");
@@ -70,23 +46,28 @@ export function buildServerBundle(folder: string, outDir: string,{serverSideRend
   const tmp = `${tmpdir()}/h0-${randomUUID()}.ts`;
   serverSideRendering = serverSideRendering && spec.fetchModel.runtime !== "client-only";
   writeFileSync(tmp, `
-      import {createServeFunctiom} from "${__filename}";
+      import {createServeFunction} from "${resolve(__dirname, "serve.ts")}";
+      import {next} from "@vercel/edge";
       import * as spec from "${indexModule}";
 
       const templateHTML = decodeURIComponent("${encodeURIComponent(templateWithIncludes)}");
-      export const serve = createServeFunction(spec, templateHTML, {serverSideRendering: ${serverSideRendering}});
+      const serve = createServeFunction(spec, templateHTML, {serverSideRendering: ${serverSideRendering}});
+      export default async function h0_middleware(req) {
+        const response = await serve(req);
+        return response || next();
+      }
   `);
 
 
-  buildSync({
+  const result = buildSync({
       bundle: true,
       sourcemap: "inline",
       format: "esm",
       target: "node18",
-      outfile: resolve(outDir, "index.js"),
+      external: ["@vercel/edge", "linkedom"],
       define: {RUNTIME: "\"node\""},
+      outfile: resolve(outFile),
       entryPoints: [tmp],
       ...buildOptions});
   rmSync(tmp);
-
 }

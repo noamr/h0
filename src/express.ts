@@ -3,7 +3,8 @@ import Express from "express";
 import {resolve, dirname} from "path";
 import { BuildOptions } from "esbuild";
 import {readFileSync, existsSync, mkdirSync} from "fs";
-import { buildClientBundle, resolveIncludes, createServeFunction } from "./build";
+import { buildClientBundle, resolveIncludes } from "./build";
+import { createServeFunction } from "./serve";
 import os from "os"
 import {randomUUID} from "crypto";
 
@@ -65,6 +66,11 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         }
 
         const response = await serve(fetchRequest);
+        if (!response) {
+            next();
+            return;
+        }
+
         if (response.status === 200)
             res.send(await response.text());
         else {
