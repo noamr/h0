@@ -64,7 +64,6 @@ export function buildVercelMiddleware(folder: string, outFile: string,{serverSid
       sourcemap: "inline",
       format: "esm",
       target: "node18",
-      external: ["@vercel/edge", "linkedom"],
       define: {RUNTIME: "\"node\""},
       outfile: resolve(outFile),
       entryPoints: [tmp],

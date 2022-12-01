@@ -34,11 +34,13 @@ if (existsSync(".vercel/output"))
 mkdirSync(".vercel/output");
 mkdirSync(".vercel/output/functions");
 mkdirSync(".vercel/output/functions/_middleware.func");
+mkdirSync(".vercel/output/functions/_middleware.func/node_modules");
 mkdirSync(".vercel/output/static");
 
 for (const pub of publicFolders)
   copySync(pub, ".vercel/output/static");
 
+copySync("node_modules", ".vercel/output/functions/_middleware.func/node_modules");
 
   writeFileSync(".vercel/output/config.json", JSON.stringify({
   "version": 3,
