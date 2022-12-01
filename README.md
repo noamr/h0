@@ -144,7 +144,7 @@ And by following some design principles, you shouldn't end up with verbose or ha
 ## TODO-MVC example
 
 ### Live version
-See live [here](https://todo-mvc.onrender.com/todos/)
+See live [here](https://h0-movies-demo.vercel.app/)
 
 ### Code
 See `examples/todo-mvc`
