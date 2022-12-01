@@ -28,13 +28,13 @@ if (!existsSync(htmlFile))
 if (!existsSync(indexModule))
     throw new Error(`Index ${indexModule} not found`);
 
-if (existsSync(".vercel"))
-  rmSync(".vercel", {recursive: true});
+if (existsSync(".vercel/output"))
+  rmSync(".vercel/output", {recursive: true});
 
-  mkdirSync(".vercel");
-  mkdirSync(".vercel/output");
-  mkdirSync(".vercel/output/_middleware.func");
-  mkdirSync(".vercel/output/static");
+mkdirSync(".vercel/output");
+mkdirSync(".vercel/output/functions");
+mkdirSync(".vercel/output/functions/_middleware.func");
+mkdirSync(".vercel/output/static");
 
 for (const pub of publicFolders)
   copySync(pub, ".vercel/output/static");
@@ -51,9 +51,9 @@ for (const pub of publicFolders)
   ]
 }));
 
-writeFileSync(".vercel/output/_middleware.func/.vc-config.json", JSON.stringify({
+writeFileSync(".vercel/output/functions/_middleware.func/.vc-config.json", JSON.stringify({
   "runtime": "edge",
   "entrypoint": "index.js"
 }));
 buildClientBundle(indexModule, resolve(".vercel/output/static/.h0"), {minify: !!minify});
-buildVercelMiddleware(dir, ".vercel/output/_middleware.func/index.js", {serverSideRendering: ssr});
+buildVercelMiddleware(dir, ".vercel/output/functions/_middleware.func/index.js", {serverSideRendering: ssr});
