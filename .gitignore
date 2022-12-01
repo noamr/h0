@@ -108,3 +108,4 @@ dist
 /playwright-report/
 /playwright/.cache/
 .vscode
+.vercel

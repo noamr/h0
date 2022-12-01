@@ -29,7 +29,7 @@
     },
     "scripts": {
         "test": "playwright test --workers 1",
-        "build:vercel:movies": "node ./build-vercel.js --ssr ./examples/movies --out dist/vercel-movies --minify --name h0-movies",
+        "build:vercel:movies": "node ./build-vercel.js --ssr ./examples/movies --minify",
         "start:dev:movies:ssr": "nodemon ./cli.js --ssr --dir examples/movies --port 8000 -u examples/movies/public --watch ./examples --ext ts,js,mjs,json,html"
     }
 }
