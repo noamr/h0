@@ -71,12 +71,13 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
             return;
         }
 
+        for (const [header, value] of response.headers)
+            res.setHeader(header, value);
+
         if (response.status === 200)
             res.send(await response.text());
         else {
             res.sendStatus(response.status);
-            for (const [header, value] of response.headers)
-                res.setHeader(header, value);
         }
     });
 

@@ -189,6 +189,16 @@ function updateGenreLink(li: Element, value: Genre) {
 }
 
 const languageDisplayNames = new Intl.DisplayNames(['en'], {type: "language"});
+export const paths = ["/", "/movie", "/genre", "/search", "/person"];
+export const links = [
+  {as: "style", href: "nav.css", rel: "preload"},
+  {as: "style", href: "theme.css", rel: "preload"},
+  {as: "style", href: "article.css", rel: "preload"},
+  {as: "style", href: "main.css", rel: "preload"},
+  {as: "style", href: "header.css", rel: "preload"},
+  {as: "image", href: "icons/loading.svg", rel: "preload"},
+  {href: "https://image.tmdb.org", rel: "preconnect"}
+];
 
 export async function renderView(response: Response, root: Element) {
   const model = (await response.json()) as Model;

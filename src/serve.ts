@@ -1,26 +1,59 @@
 import { H0Spec } from "./h0";
 import { DOMParser } from "linkedom";
-export function createServeFunction(spec: H0Spec, templateHTML: string, {serverSideRendering}: {serverSideRendering: boolean}) {
+export function createServeFunction(spec: H0Spec, templateHTML: string, {serverSideRendering, stream}: {serverSideRendering: boolean, stream: boolean}) {
   return async function serve(req: Request): Promise<Response | null> {
-      const {fetchModel, renderView} = spec;
-      const accept = req.headers.get("accept") || "*/*";
-      globalThis.RUNTIME = "node";
-      const response = await fetchModel(req);
+      const {fetchModel, renderView, links, paths} = spec;
+      const url = new URL(req.url);
+      if (paths && !paths.includes(url.pathname))
+        return null;
 
-      if (!response)
+      globalThis.RUNTIME = "node";
+
+      const responsePromise = fetchModel(req);
+      let response = null as Response | null;
+
+      stream = stream && !!paths;
+
+      if (!stream) {
+        response = await responsePromise;
+        if (!response)
           return null;
+      }
+
+      const accept = req.headers.get("accept") || "*/*";
 
       if (!accept.includes("text/html"))
-          return response;
+        return response;
 
-      const htmlHeaderParams = {headers: {"Content-Type": "text/html"}};
+      const htmlHeaderParams = {headers: {"Content-Type": "text/html; charset=utf-8"}};
 
-      if (!response || !renderView || !serverSideRendering || fetchModel.runtime === "client-only")
+      if (!renderView || !serverSideRendering || fetchModel.runtime === "client-only")
           return new Response(templateHTML, htmlHeaderParams);
+
+      const encoder = new TextEncoder();
+      let streamController : ReadableStreamController<Uint8Array> | null = null;
+
+      const readable = new ReadableStream({
+        start(controller) {
+          streamController = controller;
+        },
+      });
 
       const document = new DOMParser().parseFromString(templateHTML, "text/html");
       const rootElement = spec.selectRoot?.(document as any as Document) || document.documentElement;
-      await renderView(response, rootElement as HTMLElement);
-      return new Response(document.toString(), htmlHeaderParams);
+      responsePromise.then(async resp => {
+        await renderView(resp!, rootElement as HTMLElement);
+        streamController?.enqueue(encoder.encode(document.toString()));
+        streamController?.close();
+      });
+      const finalResponse = new Response(readable, htmlHeaderParams);
+      for (const link of links || []) {
+        if (link.rel === "preload")
+          finalResponse.headers.append("Link", `<${link.href}>;as="${link.as}";rel="preload"`);
+        else if (link.rel === "preconnect")
+          finalResponse.headers.append("Link", `<${link.href}>;rel="preconnect"`);
+      }
+
+      return finalResponse;
   }
 }
