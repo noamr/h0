@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
@@ -14,7 +14,7 @@
         <a id="hamburgerButton" role="button" tabindex="0">☰</a>
         <form id="searchForm" tabindex="1" action="/search">
           <input type="hidden" name="page" value="1">
-          <button id="searchSubmit"><h0-include src="/icons/search.svg"></h0-include></button>
+          <button id="searchSubmit" aria-label="Search"><h0-include src="/icons/search.svg"></h0-include></button>
           <input placeholder="Search for a Movie..." id="searchBox" type="text"
             name="searchTerm" required>
         </form>
@@ -22,6 +22,7 @@
       <nav tabindex="-1">
         <a class="logo" href="/?categpry=popular&page=1">
           <img
+            loading="lazy"
             class='logo-img'
             width='150'
             height='150'
@@ -55,8 +56,8 @@
           <ul id="movieList">
           </ul>
           <div class="pagination">
-            <a href="#" id="prev"><h0-include src="icons/prev.svg"></h0-include></a>
-            <a href="#" id="next"><h0-include src="icons/next.svg"></h0-include></a>
+            <a href="#" id="prev" aria-label="Next"><h0-include src="icons/prev.svg"></h0-include></a>
+            <a href="#" id="next" aria-label="Next"><h0-include src="icons/next.svg"></h0-include></a>
           </div>
         </section>
       </main>
