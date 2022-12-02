@@ -59,4 +59,4 @@ writeFileSync(".vercel/output/functions/_middleware.func/.vc-config.json", JSON.
   "entrypoint": "index.js"
 }));
 buildClientBundle(indexModule, resolve(".vercel/output/static/.h0"), {minify: !!minify});
-buildVercelMiddleware(dir, ".vercel/output/functions/_middleware.func/index.js", {serverSideRendering: ssr, stream});
+buildVercelMiddleware(dir, ".vercel/output/functions/_middleware.func/index.js", {serverSideRendering: ssr, stream: !!runOptions.stream});
