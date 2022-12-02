@@ -62,11 +62,23 @@ interface Model {
   searchTerm: string;
   genres: Genre[];
   categories: typeof categories;
+  config: TMDBConfig;
+}
+
+interface TMDBConfig {
+  images: {
+    secure_base_url: string;
+    backdrop_sizes: string[];
+    logo_sizes: string[];
+    poster_sizes: string[];
+    profile_sizess: string[];
+  }
 }
 
 export const scope = "/";
 
 let genres = null as null | Promise<Genre[]>;
+let config = null as null | Promise<TMDBConfig>;
 export async function fetchModel(request: Request) : Promise<Response> {
   const {TMDB_API_KEY} = process.env;
   if (!TMDB_API_KEY) {
@@ -82,6 +94,10 @@ export async function fetchModel(request: Request) : Promise<Response> {
     const res = await fetch(url.href, {mode: "cors"});
     return res.json() as Promise<Res>;
   }
+
+  if (!config)
+    config = tmdb<TMDBConfig>("/configuration");
+
 
   if (!genres)
     genres = tmdb<{genres: Genre[]}>("/genre/movie/list").then(result => result.genres);
@@ -99,6 +115,7 @@ export async function fetchModel(request: Request) : Promise<Response> {
 
   const defaultModel = {
     genres: await genres!,
+    config: await config,
     categories,
     url: request.url,
     searchTerm,
@@ -174,11 +191,6 @@ export async function fetchModel(request: Request) : Promise<Response> {
 
 fetchModel.runtime = "server-only";
 
-function imageURL(path : string | null, width : number) {
-  const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
-  return path ? `${TMDB_IMAGE_BASE_URL}/w${width}${path}` : '/nothing.svg';
-}
-
 function ratingAsPercent(r: number) {
   return `${r * 10}%`;
 }
@@ -202,7 +214,13 @@ export const links = [
 ];
 
 export async function renderView(response: Response, root: Element) {
+
   const model = (await response.json()) as Model;
+  console.log(model)
+  function imageURL(path : string | null, width : number) {
+    return path ? `${model.config.images.secure_base_url}/w${width}${path}` : '/nothing.svg';
+  }
+
   const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
   root.querySelector("head title")!.innerHTML = model.docTitle;
   const urlRecord = new URL(url);
@@ -237,8 +255,9 @@ export async function renderView(response: Response, root: Element) {
       })
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
-    movieRoot.querySelector(".artwork")!.setAttribute("src", imageURL(movie.poster_path, 780));
-    movieRoot.querySelector(".artwork")!.setAttribute("alt", `Poster for ${movie.title}`);
+    const artwork = movieRoot.querySelector(".artwork")! as HTMLImageElement;
+    artwork.setAttribute("src", imageURL(movie.poster_path, 500));
+    artwork.setAttribute("alt", `Poster for ${movie.title}`);
     movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
     movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
     movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
@@ -261,12 +280,12 @@ export async function renderView(response: Response, root: Element) {
       template: root.querySelector("#movieTemplate") as HTMLTemplateElement,
       keyAttribute: "id",
       updateItem: (element: Element, movie: Movie, key, index) => {
-        element.setAttribute("href", `/movie?id=${movie.id}`);
+        element.querySelector("a")!.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
         element.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
         const poster = element.querySelector(".posterImg")!;
         poster.setAttribute("loading", index === 0 ? "eager" : "lazy");
-        poster.setAttribute("src", imageURL(movie.poster_path, 342));
+        poster.setAttribute("src", imageURL(movie.poster_path, 500));
         element.querySelector(".posterImg")!.setAttribute("alt", `Poster for ${movie.title}`);
       }
     }),
