@@ -191,6 +191,7 @@ function updateGenreLink(li: Element, value: Genre) {
 const languageDisplayNames = new Intl.DisplayNames(['en'], {type: "language"});
 export const paths = ["/", "/movie", "/genre", "/search", "/person"];
 export const links = [
+  {as: "style", href: "style.css", rel: "preload"},
   {as: "style", href: "nav.css", rel: "preload"},
   {as: "style", href: "theme.css", rel: "preload"},
   {as: "style", href: "article.css", rel: "preload"},

@@ -38,7 +38,7 @@ export function resolveIncludes(templateHTML: string, templateRoot: string) {
   return document.toString();
 }
 
-export function buildVercelMiddleware(folder: string, outFile: string,{serverSideRendering, buildOptions}: {serverSideRendering: boolean, buildOptions?: BuildOptions}) {
+export function buildVercelMiddleware(folder: string, outFile: string,{serverSideRendering, stream, buildOptions}: {serverSideRendering: boolean, stream: boolean, buildOptions?: BuildOptions}) {
   const indexModule = resolve(folder, "index.h0.ts");
   const spec = require(indexModule) as H0Spec;
   const template = readFileSync(resolve(folder, "template.h0.html"), "utf-8");
@@ -51,7 +51,7 @@ export function buildVercelMiddleware(folder: string, outFile: string,{serverSid
       import * as spec from "${indexModule}";
 
       const templateHTML = decodeURIComponent("${encodeURIComponent(templateWithIncludes)}");
-      const serve = createServeFunction(spec, templateHTML, {serverSideRendering: ${serverSideRendering}});
+      const serve = createServeFunction(spec, templateHTML, {serverSideRendering: ${serverSideRendering}, steam: ${stream}});
       export default async function h0_middleware(req) {
         const response = await serve(req);
         return response || next();

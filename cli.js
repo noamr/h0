@@ -7,6 +7,7 @@ const optionDefinition = [
     {name: 'port', alias: 'p', type: Number },
     {name: 'dir', alias: 'd', multiple: true, defaultOption: true},
     {name: 'ssr', alias: 's', type: Boolean},
+    {name: 'stream', type: Boolean},
     {name: 'public', alias: 'u', multiple: true},
     {name: 'watch', alias: 'w', type: Boolean},
     {name: 'minify', alias: 'm', type: Boolean}
@@ -23,6 +24,8 @@ for (const dir of runOptions.dir) {
     const options = {watch: runOptions.watch, esbuild: {}};
     if (runOptions.ssr)
         options.serverSideRendering = true;
+    if (runOptions.stream)
+        options.stream = true;
     if (runOptions.minify)
         options.esbuild.minify = true;
     app.use(routerFromFolder(dir, options));

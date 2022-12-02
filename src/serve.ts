@@ -8,7 +8,6 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
         return null;
 
       globalThis.RUNTIME = "node";
-
       const responsePromise = fetchModel(req);
       let response = null as Response | null;
 
@@ -23,7 +22,7 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
       const accept = req.headers.get("accept") || "*/*";
 
       if (!accept.includes("text/html"))
-        return response;
+        return await responsePromise;
 
       const htmlHeaderParams = {headers: {"Content-Type": "text/html; charset=utf-8"}};
 
@@ -36,6 +35,8 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
       const readable = new ReadableStream({
         start(controller) {
           streamController = controller;
+          if (stream)
+            streamController.enqueue(new Uint8Array());
         },
       });
 

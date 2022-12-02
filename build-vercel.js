@@ -7,6 +7,7 @@ const { existsSync, writeFileSync, write, rm, rmdirSync } = require("fs");
 const optionDefinition = [
     {name: 'dir', alias: 'd', defaultOption: true},
     {name: 'ssr', alias: 's', type: Boolean},
+    {name: 'stream', type: Boolean},
     {name: 'public', alias: 'u', multiple: true},
     {name: 'minify', alias: 'm', type: Boolean},
 ];
@@ -58,4 +59,4 @@ writeFileSync(".vercel/output/functions/_middleware.func/.vc-config.json", JSON.
   "entrypoint": "index.js"
 }));
 buildClientBundle(indexModule, resolve(".vercel/output/static/.h0"), {minify: !!minify});
-buildVercelMiddleware(dir, ".vercel/output/functions/_middleware.func/index.js", {serverSideRendering: ssr});
+buildVercelMiddleware(dir, ".vercel/output/functions/_middleware.func/index.js", {serverSideRendering: ssr, stream});

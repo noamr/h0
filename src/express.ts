@@ -17,6 +17,7 @@ interface ServerConfig {
 
 export interface ServerOptions {
     serverSideRendering: boolean;
+    stream: boolean;
     additionalPublicFolders: string[];
     esbuild: BuildOptions
     watch: boolean
@@ -37,12 +38,12 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
     if (!existsSync(indexModule))
         throw new Error(`Module ${indexModule} not found`);''
 
-    const serverSideRendering = !!(options?.serverSideRendering);
+    const {serverSideRendering, stream} = options || {};
     const spec = require(indexModule) as H0Spec;
 
     const scope = spec.scope || "/";
 
-    const serve = createServeFunction(spec, resolveIncludes(templateHTML, dirname(indexModule)), {serverSideRendering});
+    const serve = createServeFunction(spec, resolveIncludes(templateHTML, dirname(indexModule)), {serverSideRendering: !!serverSideRendering, stream: !!stream});
 
     const expressRouter = Express.Router();
     for (const publicFolder of publicFolders.filter(existsSync))
