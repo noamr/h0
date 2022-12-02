@@ -72,16 +72,18 @@ nav ul a:current {
   color: var(--palette-secondary-main);
 }
 
+#hamburgerArea {
+  font-size: 9ch;
+  cursor: pointer;
+  color: var(--palette-secondary-main);
+  position: absolute;
+  display: none;
+}
+
 #hamburgerButton {
   appearance: none;
   background: none;
   border: none;
-  width: 25px;
-  font-size: 9ch;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--palette-secondary-main);
-  visibility: hidden;
   text-decoration: none;
 }
 
@@ -96,6 +98,10 @@ main, article {
   max-height: 100vh;
 }
 
+#hamburgerArea:has(#hamburgerButton:checked) {
+  position: fixed;
+  inset: 0;
+}
 
 @media only screen and (max-width: 1000px) {
   main {
@@ -108,16 +114,20 @@ main, article {
     max-height: unset;
   }
 
-  #hamburgerButton {
-    visibility: visible;
+  body:has(#hamburgerButton:checked) nav {
+    transform: none;
   }
 
-  body:has(#hamburgerButton:focus) nav, nav:focus-within {
-    transform: none;
+  #hamburgerButton:checked {
+    visibility: hidden;
   }
 
   nav {
     position: fixed;
     transform: translateX(-100%);
+  }
+
+  #hamburgerArea {
+    display: block;
   }
 }
