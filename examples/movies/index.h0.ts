@@ -204,7 +204,7 @@ export const links = [
 export async function renderView(response: Response, root: Element) {
   const model = (await response.json()) as Model;
   const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
-  root.ownerDocument.querySelector("head title")!.innerHTML = model.docTitle;
+  root.querySelector("head title")!.innerHTML = model.docTitle;
   const urlRecord = new URL(url);
   root.querySelector("body")!.dataset.path = urlRecord.pathname;
   const next = page < totalPages ? new URL(url) : null;
