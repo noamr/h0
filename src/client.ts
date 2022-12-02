@@ -35,7 +35,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
 
             switch (response.status) {
             case 200:
-                renderView(response, selectRoot(context.document) as HTMLElement);
+                await renderView(response, selectRoot(context.document) as HTMLElement);
                 switch (historyMode) {
                     case "push":
                         context.history.pushState(null, "", req.url);
