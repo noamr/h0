@@ -239,7 +239,7 @@ export async function renderView(response: Response, root: Element) {
     });
     movieRoot.querySelector("#synopsys")!.innerHTML = movie.overview;
     movieRoot.querySelector(".artwork")!.setAttribute("src", imageURL(movie.poster_path, 780));
-    movieRoot.querySelector(".artwork")!.setAttribute("alt", `Poster for ${movie.title}`;
+    movieRoot.querySelector(".artwork")!.setAttribute("alt", `Poster for ${movie.title}`);
     movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
     movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
     movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
