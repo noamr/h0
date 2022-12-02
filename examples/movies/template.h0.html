@@ -20,29 +20,34 @@
             name="searchTerm" required>
         </form>
       </header>
-      <nav tabindex="-1">
-        <a class="logo" href="/?categpry=popular&page=1">
-          <img
-            class='logo-img'
-            width='150'
-            height='150'
-            src='/icons/logo.svg'
-            alt='movie ticket logo' />
-        </a>
-        <H3>Discover</H3>
-        <ul id="categoryList">
-          <li><a href="/?category=popular"><h0-include src="/icons/heart.svg"></h0-include>Popular</a></li>
-          <li><a href="/?category=upcoming"><h0-include src="/icons/calendar.svg"></h0-include>Upcoming</a></li>
-          <li><a href="/?category=top_rated"><h0-include src="/icons/poll.svg"></h0-include>Top Rated</a></li>
-        </ul>
-        <H3>Genres</H3>
-        <ul id="genreList"></ul>
-        <img class="tmdb-mark"
-          width='300'
-          height='118'
-          alt='The Movie Database'
-          src='/icons/tmdbgreen.svg' />
-      </nav>
+      <details>
+        <summary>
+          <button id="hamburgerButton">☰</button>
+          <nav tabindex="-1">
+            <a class="logo" href="/?categpry=popular&page=1">
+              <img
+                class='logo-img'
+                width='150'
+                height='150'
+                src='/icons/logo.svg'
+                alt='movie ticket logo' />
+            </a>
+            <H3>Discover</H3>
+            <ul id="categoryList">
+              <li><a href="/?category=popular"><h0-include src="/icons/heart.svg"></h0-include>Popular</a></li>
+              <li><a href="/?category=upcoming"><h0-include src="/icons/calendar.svg"></h0-include>Upcoming</a></li>
+              <li><a href="/?category=top_rated"><h0-include src="/icons/poll.svg"></h0-include>Top Rated</a></li>
+            </ul>
+            <H3>Genres</H3>
+            <ul id="genreList"></ul>
+            <img class="tmdb-mark"
+              width='300'
+              height='118'
+              alt='The Movie Database'
+              src='/icons/tmdbgreen.svg' />
+          </nav>
+        </summary>
+      </details>
       <main>
         <h1>Title</h1>
         <h2>Subtitle</h2>
