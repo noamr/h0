@@ -261,11 +261,13 @@ export async function renderView(response: Response, root: Element) {
       container: root.querySelector("#movieList")!,
       template: root.querySelector("#movieTemplate") as HTMLTemplateElement,
       keyAttribute: "id",
-      updateItem: (element: Element, movie: Movie) => {
+      updateItem: (element: Element, movie: Movie, key, index) => {
         element.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
         element.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
-        element.querySelector(".posterImg")!.setAttribute("src", imageURL(movie.poster_path, 342));
+        const poster = element.querySelector(".posterImg")!;
+        poster.setAttribute("loading", index === 0 ? "eager" : "lazy");
+        poster.setAttribute("src", imageURL(movie.poster_path, 342));
         element.querySelector(".posterImg")!.setAttribute("alt", `Poster for ${movie.title}`);
       }
     }),
