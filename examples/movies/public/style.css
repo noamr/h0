@@ -228,7 +228,7 @@ main > h2 {
   }
 }
 
-a#next:not([href]), a#prev:not([href]) {
+a#next[href="#"], a#prev[href="#"] {
   visibility: hidden;
 }
 

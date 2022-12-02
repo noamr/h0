@@ -217,13 +217,11 @@ export async function renderView(response: Response, root: Element) {
   root.querySelector("h2")!.innerHTML = subtitle;
   const nextButton = root.querySelector("a#next")!;
   const prevButton = root.querySelector("a#prev")!;
-  nextButton.removeAttribute("href");
-  prevButton.removeAttribute("href");
   root.querySelector("input#searchBox")!.setAttribute("value", searchTerm);
   if (next)
-    nextButton.setAttribute("href", next.href);
+    nextButton.setAttribute("href", next ? next.href : "#");
   if (prev)
-    prevButton.setAttribute("href", prev.href);
+    prevButton.setAttribute("href", prev ? prev.href : "#");
 
   if (movie) {
     console.log(movie)

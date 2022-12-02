@@ -13,7 +13,7 @@
     <body>
       <header>
         <a id="hamburgerButton" role="button" tabindex="0">☰</a>
-        <form id="searchForm" tabindex="1" action="/search">
+        <form id="searchForm" tabindex="0" action="/search">
           <input type="hidden" name="page" value="1">
           <button id="searchSubmit" aria-label="Search"><h0-include src="/icons/search.svg"></h0-include></button>
           <input placeholder="Search for a Movie..." id="searchBox" type="text"
@@ -83,12 +83,14 @@
         <span id="additionalInfo"></span>
       </article>
       <template id="movieTemplate">
+        <li>
         <a href="#" class="poster">
           <img class="posterImg gradient" width="230" height="345" alt="movie poster"
             loading="lazy">
           <h3 class="movieTitle">Movie Title</h3>
           <div class="rating"></div>
         </a>
+      </li>
       </template>
       <template id="listItemWithLink">
         <ul><a href="#"></a></ul>
