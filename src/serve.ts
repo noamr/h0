@@ -2,7 +2,7 @@ import { H0Spec } from "./h0";
 import { DOMParser } from "linkedom";
 export function createServeFunction(spec: H0Spec, templateHTML: string, {serverSideRendering, stream}: {serverSideRendering: boolean, stream: boolean}) {
   return async function serve(req: Request): Promise<Response | null> {
-      const {fetchModel, renderView, links, paths} = spec;
+      const {fetchModel, renderView, paths} = spec;
       const url = new URL(req.url);
       if (paths && !paths.includes(url.pathname))
         return null;
@@ -48,12 +48,10 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
         streamController?.close();
       });
       const finalResponse = new Response(readable, htmlHeaderParams);
-      for (const link of links || []) {
-        if (link.rel === "preload")
-          finalResponse.headers.append("Link", `<${link.href}>;as="${link.as}";rel="preload"`);
-        else if (link.rel === "preconnect")
-          finalResponse.headers.append("Link", `<${link.href}>;rel="preconnect"`);
-      }
+      for (const link of document.querySelectorAll("link[rel=preload]"))
+        finalResponse.headers.append("Link", `<${link.getAttribute("href")}>;as="${link.getAttribute("as")}";rel="preload"`);
+      for (const link of document.querySelectorAll("link[rel=preconnect]"))
+        finalResponse.headers.append("Link", `<${link.getAttribute("href")}>;rel="preconnect"`);
 
       return finalResponse;
   }

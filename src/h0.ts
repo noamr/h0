@@ -16,7 +16,6 @@ export interface H0Spec {
     selectRoot: (root: Document) => Element;
     mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Navigator}): void;
     paths?: string[];
-    links?: Array<{href: string} & ({rel: "preload", as: "image" | "font" | "style" | "script", } | {rel: "preconnect"})>;
     scope: string;
     template: string;
 }
