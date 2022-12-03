@@ -217,3 +217,28 @@ article #ads {
   height: 1.5rem;
   margin-left: 1rem;
 }
+
+ul#castList {
+  display: flex;
+  overflow: scroll;
+  grid-area: 9 / 2 / 10 / 6;
+  max-width: 400px;
+}
+
+ul#castList li {
+  margin: 3px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+}
+
+ul#castList img {
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: clip;
+}
+
+ul#castList::-webkit-scrollbar-button {
+  background: red;
+}

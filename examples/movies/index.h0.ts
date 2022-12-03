@@ -15,6 +15,16 @@ const categories = {
   top_rated: "Top Rated",
 };
 
+interface Person {
+  id: number;
+  name: string;
+  profile_path: string | null;
+}
+
+interface Credits {
+  cast: Person[];
+}
+
 interface Movie {
   poster_path: string;
   id: number;
@@ -36,6 +46,7 @@ interface Movie {
   imdb_id: string;
   homepage: string;
   trailer: string;
+  cast: Person[];
 }
 
 interface MoviesResult {
@@ -176,7 +187,8 @@ export async function fetchModel(request: Request) : Promise<Response> {
       return Response.json(model);
     }
     case "/movie": {
-      const movie = await tmdb<Movie>(`/movie/${id}`);
+      const [movie, credits] = await Promise.all([tmdb<Movie>(`/movie/${id}`), tmdb<Credits>(`/movie/${id}/credits`)]);
+      movie.cast = credits.cast;
 
       const model : Model = {
         ...defaultModel,
@@ -253,6 +265,21 @@ export async function renderView(response: Response, root: Element) {
     movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
     movieRoot.querySelector("a#website")!.setAttribute("href", movie.homepage || "");
     movieRoot.querySelector("a#trailer")!.setAttribute("href", movie.trailer || "");
+    reconcileChildren<Person>({
+      model: arrayModel(movie.cast! || [], "id"),
+      view: templateView({
+        container: movieRoot.querySelector("#castList")!,
+        template: root.querySelector("template#castPerson")!,
+        updateItem: (listItem, person) => {
+          const anchor = listItem.querySelector("a")!
+          anchor.setAttribute("title", person.name);
+          const img = listItem.querySelector("img") as HTMLImageElement;
+          img.setAttribute("src", person.profile_path ? imageURL(person.profile_path, 45) : "/person.svg");
+          img.setAttribute("alt", person.name);
+          anchor.setAttribute("href", `/person?id=${person.id}`);
+        }
+      })
+    })
   }
 
   reconcileChildren<Genre>({
