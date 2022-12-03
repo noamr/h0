@@ -57,9 +57,7 @@ body {
   /* at MUI */
   --background-blend-gradient: linear-gradient(rgba(255, 255, 255, 0) 68%, rgb(255, 255, 255) 100%);
 }
-
-@media (prefers-color-schenme: dark) {
-  body {
+  body:has(#darkScheme:checked) {
   /* MEMO: drop image filter in the dark mode for now */
   --image-filter: grayscale(0%);
   --palette-background-default: #303030;
@@ -96,10 +94,10 @@ body {
   --background-blend-gradient: linear-gradient(rgba(255, 255, 255, 0) 68%, rgb(48, 48, 48) 100%);
 }
 
-body img:not([src*=".svg"]) {
+body:has(#darkScheme:checked) img:not([src*=".svg"]) {
   filter: var(--image-filter);
 }
-}
+
 
 * {
   margin: 0;

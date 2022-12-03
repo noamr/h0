@@ -7,7 +7,7 @@
     <meta name="description" content="A non-trivial Movies learning application
       buuilt without a framework, to show developers how they can deliver
       reasonably good experience while maintaining good developer experience.">
-    <script type="module" src="./.h0/client.js" defer></script>
+    <script type="module" src="./.h0/client.js" async></script>
     <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -15,13 +15,19 @@
         <label id="hamburgerArea">
           <input id="hamburgerButton" type="checkbox" role="button" aria-label="Open Menu" id="hamburgerButton">☰
         </label>
-        <div></div>
+        <div id="colorScheme">
+          <label for="darkScheme" id="light">☀</label>
+          <input type="checkbox" id="darkScheme">
+          <label for="darkScheme" id="dark">☾</label>
+        </div>
         <form id="searchForm" tabindex="0" action="/search">
           <input type="hidden" name="page" value="1">
-          <button id="searchSubmit" aria-label="Search"><h0-include src="/icons/search.svg"></h0-include></button>
+          <button id="searchSubmit" aria-label="Search">
+            <h0-include src="/icons/search.svg"></h0-include></button>
           <input placeholder="Search for a Movie..." id="searchBox" type="text"
             name="searchTerm" required>
         </form>
+
       </header>
         <nav>
           <a class="logo" href="/?categpry=popular&page=1">

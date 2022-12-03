@@ -72,6 +72,10 @@ nav ul a:current {
   color: var(--palette-secondary-main);
 }
 
+nav ul a * {
+  pointer-events: none;
+}
+
 #hamburgerArea {
   font-size: 9ch;
   cursor: pointer;
