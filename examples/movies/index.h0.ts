@@ -244,7 +244,6 @@ const languageDisplayNames = new Intl.DisplayNames(['en'], {type: "language"});
 export const paths = ["/", "/movie", "/genre", "/search", "/person"];
 
 export async function renderView(response: Response, root: Element) {
-
   const model = (await response.json()) as Model;
   console.log(model)
   function imageURL(path : string | null, width : number) {
@@ -315,7 +314,7 @@ export async function renderView(response: Response, root: Element) {
     const artwork = personRoot.querySelector(".artwork")! as HTMLImageElement;
     artwork.setAttribute("src", imageURL(person.profile_path, 500));
     artwork.setAttribute("alt", person.name);
-    personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/nm${person.imdb_id}` : "");
+    personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/nm${person.imdb_id}` : "#");
     personRoot.querySelector("a#website")!.setAttribute("href", person.homepage || "#");
   }
 
