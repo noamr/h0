@@ -5,7 +5,7 @@ declare global {
 
 export type HistoryMode = "push" | "replace" | "transparent";
 
-export interface H0Navigator {
+export interface H0Navigator extends EventTarget {
     navigate(info: RequestInfo, historyMode: HistoryMode): boolean;
     reload(): void;
 }

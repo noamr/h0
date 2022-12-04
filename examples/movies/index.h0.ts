@@ -314,7 +314,7 @@ export async function renderView(response: Response, root: Element) {
     const artwork = personRoot.querySelector(".artwork")! as HTMLImageElement;
     artwork.setAttribute("src", imageURL(person.profile_path, 500));
     artwork.setAttribute("alt", person.name);
-    personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/nm${person.imdb_id}` : "#");
+    personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/${person.imdb_id}` : "#");
     personRoot.querySelector("a#website")!.setAttribute("href", person.homepage || "#");
   }
 
@@ -355,6 +355,9 @@ export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window:
   root.querySelector("header form")!.addEventListener("focus", () => {
     (root.querySelector("input#searchBox")! as HTMLElement).focus();
   })
+  h0.addEventListener("navigate", () => {
+    window.document.querySelector("main")!.scrollTo(0, 0);
+  });
   document.addEventListener("load", ({target}) => {
     const img = target as HTMLImageElement;
     if (img.tagName === "IMG") {

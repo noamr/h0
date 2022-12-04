@@ -1,4 +1,4 @@
-import {H0Spec, HistoryMode} from "./h0";
+import {H0Navigator, H0Spec, HistoryMode} from "./h0";
 
 export function initClient(spec: H0Spec, context: Window = window) {
     const scope = spec.scope || "/";
@@ -7,6 +7,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
     if (!rootElement)
         throw new Error(`Root element not found`);
 
+    const h0 = new EventTarget() as H0Navigator;
     (rootElement as HTMLElement).addEventListener("submit", (e: SubmitEvent) => {
         if (submitForm(e.target as HTMLFormElement, e.submitter))
             e.preventDefault();
@@ -16,10 +17,6 @@ export function initClient(spec: H0Spec, context: Window = window) {
         if ((e.target instanceof HTMLAnchorElement) && navigate((e.target as HTMLAnchorElement).href, "push"))
             e.preventDefault();
     }, {capture: true});
-
-    navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
-    if (RUNTIME === "window")
-        mount?.(rootElement as HTMLElement, {window: context, h0: {navigate, reload}});
 
     function navigate(info: RequestInfo, historyMode: HistoryMode) {
         const req = new Request(info);
@@ -44,6 +41,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
                         context.history.replaceState(null, "", req.url);
                         break;
                 }
+                h0.dispatchEvent(new Event("navigate"));
                 break;
 
             case 302:
@@ -69,4 +67,12 @@ export function initClient(spec: H0Spec, context: Window = window) {
     }
 
     function reload() { return navigate(scope, "transparent"); }
+    Object.assign(h0, {navigate, reload});
+
+    navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
+    if (RUNTIME === "window") {
+        mount?.(rootElement as HTMLElement, {window: context, h0});
+        h0.dispatchEvent(new Event("navigate"));
+    }
+
 }

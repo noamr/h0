@@ -4,7 +4,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 3rem;
   grid-area: genres;
 }
 
@@ -36,7 +35,9 @@ h3:has(+ #movieGenresList) {
 #movieGenresList a:active {
   transform: translateY(2px);
 }
+
 article h3 {
+  margin-top: 2.3rem;
   margin-bottom: 1rem;
   color: var(--palette-text-primary);
   font-size: 1.5rem;
@@ -105,6 +106,16 @@ article#movie {
     "artwork ads ads ads";
 }
 
+article#person {
+  grid-template-areas:
+    "artwork title title title"
+    "artwork subtitle subtitle subtitle"
+    "artwork bio-h bio-h bio-h"
+    "artwork bio bio bio"
+    "artwork ads ads ads"
+    "artwork nothing nothing nothing"
+}
+
 @media only screen and (max-width: 1200px) {
   article#movie {
     grid-template-areas:
@@ -127,12 +138,21 @@ article#movie h3:has(+ #synopsys) {
   grid-area: synopsys-h;
 }
 
+#bio {
+  grid-area: bio;
+}
+
+article#movie h3:has(+ #bio) {
+  grid-area: bio-h;
+}
+
 article h1 {
   grid-area: title;
 }
 
 article h2 {
   grid-area: subtitle;
+  margin-bottom: 2.4rem;
 }
 
 article .artwork {
@@ -189,6 +209,7 @@ article p#synopsys {
   align-items: center;
   gap: 1rem;
   grid-area: ads;
+  margin-top: 2rem;
 }
 
 .ad-section-wrapper-links {
@@ -229,7 +250,8 @@ article p#synopsys {
 
 ul#castList {
   display: flex;
-  overflow: scroll;
+  overflow-x: scroll;
+  overflow-y: clip;
   max-width: 400px;
 }
 

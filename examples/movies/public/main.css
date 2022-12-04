@@ -102,3 +102,7 @@ a.poster h3 {
   grid-area: 1 / 1 / 2 / 2;
   clip-path:polygon(0 0 , var(--rating) 0, var(--rating) 100%, 0 100%, 0 0);
 }
+
+main {
+  scroll-behavior: smooth;
+}
