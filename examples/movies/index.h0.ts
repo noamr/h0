@@ -19,6 +19,10 @@ interface Person {
   id: number;
   name: string;
   profile_path: string | null;
+  biography: string;
+  birthday: string;
+  homepage: string | null;
+  imdb_id: string;
 }
 
 interface Credits {
@@ -74,6 +78,7 @@ interface Model {
   genres: Genre[];
   categories: typeof categories;
   config: TMDBConfig;
+  person?: Person;
 }
 
 interface TMDBConfig {
@@ -187,13 +192,36 @@ export async function fetchModel(request: Request) : Promise<Response> {
       return Response.json(model);
     }
     case "/movie": {
-      const [movie, credits] = await Promise.all([tmdb<Movie>(`/movie/${id}`), tmdb<Credits>(`/movie/${id}/credits`)]);
+      const [movie, credits, recommendations] = await Promise.all([
+        tmdb<Movie>(`/movie/${id}`),
+        tmdb<Credits>(`/movie/${id}/credits`),
+        tmdb<MoviesResult>(`/movie/${id}/recommendations`), {page}]);
       movie.cast = credits.cast;
 
       const model : Model = {
         ...defaultModel,
         docTitle: `${movie.title} - Movie`,
+        title: "Recommended",
+        subtitle: "Movies",
+        movies: recommendations.results,
+        page: recommendations.page,
         movie
+      }
+      // @ts-ignore
+      return Response.json(model);
+    }
+    case "/person": {
+      const [person, movies] = await Promise.all([
+        tmdb<Person>(`/person/${id}`),
+        tmdb<{cast: Movie[]}>(`/person/${id}/movie_credits`)]);
+      const model : Model = {
+        ...defaultModel,
+        docTitle: `${person.name} - Person`,
+        page: 1,
+        movies: movies.cast,
+        title: person.name,
+        subtitle: "Appeared In:",
+        person
       }
       // @ts-ignore
       return Response.json(model);
@@ -223,7 +251,7 @@ export async function renderView(response: Response, root: Element) {
     return path ? `${model.config.images.secure_base_url}/w${width}${path}` : '/nothing.svg';
   }
 
-  const {page, totalPages, title, subtitle, movies, url, searchTerm, movie} = model;
+  const {page, totalPages, title, subtitle, movies, url, searchTerm, movie, person} = model;
   root.querySelector("head title")!.innerHTML = model.docTitle;
   const urlRecord = new URL(url);
   root.querySelector("body")!.dataset.path = urlRecord.pathname;
@@ -233,8 +261,8 @@ export async function renderView(response: Response, root: Element) {
     next.searchParams.set("page", String(page + 1));
   if (prev)
     prev.searchParams.set("page", String(page - 1));
-  root.querySelector("h1")!.innerHTML = title;
-  root.querySelector("h2")!.innerHTML = subtitle;
+  root.querySelector("main > h1")!.innerHTML = title;
+  root.querySelector("main > h2")!.innerHTML = subtitle;
   const nextButton = root.querySelector("a#next")!;
   const prevButton = root.querySelector("a#prev")!;
   root.querySelector("input#searchBox")!.setAttribute("value", searchTerm);
@@ -244,8 +272,7 @@ export async function renderView(response: Response, root: Element) {
     prevButton.setAttribute("href", prev ? prev.href : "#");
 
   if (movie) {
-    console.log(movie)
-    const movieRoot = root.querySelector("article")!;
+    const movieRoot = root.querySelector("article#movie")!;
     movieRoot.querySelector("h1")!.innerHTML = movie.title;
     movieRoot.querySelector("h2")!.innerHTML = movie.tagline;
     reconcileChildren<Genre>({
@@ -263,8 +290,8 @@ export async function renderView(response: Response, root: Element) {
     movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${ratingAsPercent(movie.vote_average)}`);
     movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
     movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
-    movieRoot.querySelector("a#website")!.setAttribute("href", movie.homepage || "");
-    movieRoot.querySelector("a#trailer")!.setAttribute("href", movie.trailer || "");
+    movieRoot.querySelector("a#website")!.setAttribute("href", movie.homepage || "#");
+    movieRoot.querySelector("a#trailer")!.setAttribute("href", movie.trailer || "#");
     reconcileChildren<Person>({
       model: arrayModel(movie.cast! || [], "id"),
       view: templateView({
@@ -280,6 +307,16 @@ export async function renderView(response: Response, root: Element) {
         }
       })
     })
+  } else if (person) {
+    const personRoot = root.querySelector("article#person")!;
+    personRoot.querySelector("h1")!.innerHTML = person.name;
+    personRoot.querySelector("h2")!.innerHTML = new Date(person.birthday).toLocaleDateString();
+    personRoot.querySelector("#bio")!.innerHTML = person.biography;
+    const artwork = personRoot.querySelector(".artwork")! as HTMLImageElement;
+    artwork.setAttribute("src", imageURL(person.profile_path, 500));
+    artwork.setAttribute("alt", person.name);
+    personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/nm${person.imdb_id}` : "");
+    personRoot.querySelector("a#website")!.setAttribute("href", person.homepage || "#");
   }
 
   reconcileChildren<Genre>({

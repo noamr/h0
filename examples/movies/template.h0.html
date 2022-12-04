@@ -62,6 +62,43 @@
         </summary>
       </details>
       <main>
+        <article id="movie">
+          <h1>Title</h1>
+          <h2>Tagline</h2>
+          <img class="artwork gradient"
+            width="780"
+            alt="movie artwork"
+            height="1170">
+          <h3>Genres</h3>
+          <ul id="movieGenresList"></ul>
+          <h3>Synopsys</h3>
+          <p  id="synopsys"></p>
+          <span class="rating"></span>
+          <h3 >Cast</h3>
+          <section id="cast" >
+            <ul id="castList"></ul>
+          </section>
+          <section id="ads">
+            <a id="imdb" href="#"><span>IMDB</span> <h0-include src="/icons/imdb.svg"></h0-include></a>
+            <a id="website" href="#"><span>Website</span> <h0-include src="/icons/link.svg"></h0-include></a>
+            <a id="trailer" href="#"><span>Trailer</span> <h0-include src="/icons/play.svg"></h0-include></a>
+          </section>
+          <span id="additionalInfo"></span>
+        </article>
+        <article id="person">
+          <h1>Name</h1>
+          <h2>Birthdate</h2>
+          <img class="artwork gradient"
+            width="780"
+            alt="person profile"
+            height="1170">
+          <h3>Biography</h3>
+          <p id="bio"></p>
+          <section id="ads">
+            <a id="imdb" href="#"><span>IMDB</span> <h0-include src="/icons/imdb.svg"></h0-include></a>
+            <a id="website" href="#"><span>Website</span> <h0-include src="/icons/link.svg"></h0-include></a>
+          </section>
+        </article>
         <h1>Title</h1>
         <h2>Subtitle</h2>
         <section id="movies">
@@ -73,29 +110,6 @@
           </div>
         </section>
       </main>
-      <article>
-        <h1>Title</h1>
-        <h2>Tagline</h2>
-        <img class="artwork gradient"
-          width="780"
-          alt="movie artwork"
-          height="1170">
-        <h3>Genres</h3>
-        <ul id="movieGenresList"></ul>
-        <h3>Synopsys</h3>
-        <p id="synopsys"></p>
-        <span class="rating"></span>
-        <h3>Cast</h3>
-        <section id="cast">
-          <ul id="castList"></ul>
-        </section>
-        <section id="ads">
-          <a id="imdb" href="#"><span>IMDB</span> <h0-include src="/icons/imdb.svg"></h0-include></a>
-          <a id="website" href="#"><span>Website</span> <h0-include src="/icons/link.svg"></h0-include></a>
-          <a id="trailer" href="#"><span>Trailer</span> <h0-include src="/icons/play.svg"></h0-include></a>
-        </section>
-        <span id="additionalInfo"></span>
-      </article>
       <template id="movieTemplate">
         <li>
         <a href="#" class="poster">

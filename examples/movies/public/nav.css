@@ -95,7 +95,7 @@ main {
   padding: 0 4rem;
 }
 
-main, article {
+main {
   padding-top: 6rem;
   padding-bottom: 6rem;
   overflow: scroll;
@@ -113,7 +113,7 @@ main, article {
     padding-bottom: 4rem;
   }
 
-  main, article {
+  main {
     overflow: auto;
     max-height: unset;
   }
