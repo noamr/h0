@@ -4,19 +4,19 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
   return async function serve(req: Request): Promise<Response | null> {
       const {fetchModel, renderView, paths} = spec;
       const url = new URL(req.url);
-      if (paths && !paths.includes(url.pathname))
-        return null;
 
       globalThis.RUNTIME = "node";
       const responsePromise = fetchModel(req);
       let response = null as Response | null;
 
-      stream = stream && !!paths;
+      stream = stream && !!paths && paths.includes(url.pathname);
 
       if (!stream) {
         response = await responsePromise;
         if (!response)
           return null;
+        if (response.status > 300)
+          return response;
       }
 
       const accept = req.headers.get("accept") || "*/*";

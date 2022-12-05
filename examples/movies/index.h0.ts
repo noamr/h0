@@ -100,20 +100,18 @@ export async function fetchModel(request: Request) : Promise<Response> {
   if (!TMDB_API_KEY) {
     throw new Error('Missing TMDB_API_KEY in env');
   }
-  async function tmdb<Res>(path: string, params: {[key: string]: string | number} = {}) {
+  async function tmdb<Res>(path: string, params: {[key: string]: string | number} = {}, init?: RequestInit) {
     const url = new URL(TMDB_API_BASE_URL);
     url.pathname = `/${TMDB_API_VERSION}${path}`;
     for (const k in params)
       url.searchParams.set(k, String(params[k]));
     url.searchParams.set("api_key", TMDB_API_KEY!);
-    console.log(url.href);
-    const res = await fetch(url.href, {mode: "cors"});
+    const res = await fetch(url.href, {mode: "cors", ...init});
     return res.json() as Promise<Res>;
   }
 
   if (!config)
     config = tmdb<TMDBConfig>("/configuration");
-
 
   if (!genres)
     genres = tmdb<{genres: Genre[]}>("/genre/movie/list").then(result => result.genres);
@@ -123,7 +121,6 @@ export async function fetchModel(request: Request) : Promise<Response> {
   const category = url.searchParams.get("category") || "popular";
   const id = url.searchParams.get("id");
   const searchTerm = url.searchParams.get("searchTerm") || "";
-  const listId = url.searchParams.get("listId");
 
   if (!(category in categories)) {
     return new Response("", {status: 404})
@@ -139,8 +136,16 @@ export async function fetchModel(request: Request) : Promise<Response> {
     title: "",
     subtitle: "",
     page: 1,
-    totalPages: 1
+    totalPages: 1,
+    session_id: ""
   };
+
+  if (url.searchParams.get("approved") === "true" && url.searchParams.has("request_token")) {
+    const request_token = url.searchParams.get("request_token")!;
+    const {session_id} = await tmdb<{session_id: string}>("/authentication/session/new", {}, {method: "post"});
+    defaultModel.session_id = session_id;
+  }
+
 
   switch (url.pathname) {
     case "/": {
@@ -160,7 +165,7 @@ export async function fetchModel(request: Request) : Promise<Response> {
       return Response.json(model);
     }
 
-    case "/search": {
+     case "/search": {
       const result = await tmdb<MoviesResult>(`/search/movie`, {page, query: searchTerm});
 
       const model : Model = {
@@ -226,6 +231,42 @@ export async function fetchModel(request: Request) : Promise<Response> {
       // @ts-ignore
       return Response.json(model);
      }
+
+     case "/login": {
+      const {request_token, success, expires_at} = await tmdb<{request_token: string, success: boolean, expires_at: string}>("/authentication/token/new");
+      if (!success) {
+        return new Response(JSON.stringify({message: "Could not initiate request"}), {headers: {
+          "Content-Type": "application/json"
+        }, status: 403});
+      }
+      const next = url.searchParams.get("next")!;
+      const auth = new URL(`/auth`, next);
+      auth.searchParams.set("next", next);
+      auth.searchParams.set("expires_at", expires_at);
+      const tmdb_auth = new URL(`https://www.themoviedb.org/authenticate/${request_token}`);
+      tmdb_auth.searchParams.set("redirect_to", auth.toString());
+      return Response.redirect(tmdb_auth.toString());
+     }
+
+     case "/auth": {
+      const request_token = url.searchParams.get("request_token");
+      const approved = !!url.searchParams.get("approved");
+      const expires_at = url.searchParams.get("expires_at");
+      const next = url.searchParams.get("next") || new URL("/", request.url);
+      if (!approved)
+        return Response.redirect(next);
+
+      const {session_id, success} = await tmdb<{success: true, session_id: string}>("/authentication/session/new", {},
+      {method: "post", body: JSON.stringify({request_token}), headers: {"Content-Type": "application/json"}});
+
+      if (!success)
+        return Response.redirect(next);
+
+      return new Response("", {status: 302, headers: {
+        "Location": next.toString(),
+        "Set-Cookie": `tmdb_session_id=${session_id}; Expires=${expires_at}`
+      }});
+     }
     }
 }
 
@@ -245,7 +286,6 @@ export const paths = ["/", "/movie", "/genre", "/search", "/person"];
 
 export async function renderView(response: Response, root: Element) {
   const model = (await response.json()) as Model;
-  console.log(model)
   function imageURL(path : string | null, width : number) {
     return path ? `${model.config.images.secure_base_url}/w${width}${path}` : '/nothing.svg';
   }
@@ -269,6 +309,8 @@ export async function renderView(response: Response, root: Element) {
     nextButton.setAttribute("href", next ? next.href : "#");
   if (prev)
     prevButton.setAttribute("href", prev ? prev.href : "#");
+
+  root.querySelector("form#loginForm input[name=next]")!.setAttribute("value", model.url);
 
   if (movie) {
     const movieRoot = root.querySelector("article#movie")!;

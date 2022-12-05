@@ -14,7 +14,10 @@ export function buildClientBundle(indexModule: string, outDir: string, buildOpti
   writeFileSync(tmp, `
       import {initClient} from "${resolve(__dirname, "client.ts")}";
       import {renderView, scope, mount, selectRoot${fetchModelOnClient ? ", fetchModel" : ""}} from "${indexModule}";
-      initClient({scope, selectRoot, mount, fetchModel : ${fetchModelOnClient ? "fetchModel" : "fetch"}, renderView});
+      function fetchWithManualRedirects(req) {
+        fetch(req, {redirect: "manual"})
+      }
+      initClient({scope, selectRoot, mount, fetchModel : ${fetchModelOnClient ? "fetchModel" : "fetchWithManualRedirects"}, renderView});
   `);
 
   buildSync({

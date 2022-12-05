@@ -24,7 +24,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
         if (!pathname.startsWith(scope))
             return false;
 
-        fetchModel(req).then(async (response: Response | null) => {
+        fetchModel(req,).then(async (response: Response | null) => {
             if (!response) {
                 location.href = req.url;
                 return;

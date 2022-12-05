@@ -1,5 +1,5 @@
 
-header form {
+header form#searchForm {
   position: relative;
   display: flex;
   align-items: center;
@@ -28,11 +28,11 @@ header form {
   color: var(--palette-secondary-contrast-text);
 }
 
-form:not(:focus-within) #searchBox {
+#searchForm:not(:focus-within) #searchBox {
   display: none;
 }
 
-header form:focus-within {
+header #searchForm:focus-within {
   width: 40rem;
   justify-content: flex-start;
   overflow: hidden;
@@ -81,6 +81,7 @@ header form:focus-within #searchSubmit {
 
 header {
   display: grid;
+  grid-template-areas: "hamburger nothing search colorScheme login";
   align-items: center;
   grid-template-columns: max-content 1fr repeat(3, max-content);
   position: sticky;
@@ -91,19 +92,24 @@ header {
   box-shadow: var(--box-shadow-1);
   background: var(--palette-background-default);
   padding: 24px;
+  gap: 10px;
 }
 
 #hamburgerArea {
-  grid-area: 1 / 1 / 2 / 2;
+  grid-area: hamburger;
 }
 
 #searchForm {
-  grid-area: 1 / 3 / 2 / 4;
+  grid-area: search;
 }
 
 #colorScheme {
-  grid-area: 1 / 4 / 2 / 5;
+  grid-area: colorScheme;
   margin: 0 4px;
+}
+
+#login {
+  grid-area: login;
 }
 
 #dark, #light {
@@ -164,3 +170,31 @@ header {
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+#loginForm {
+  grid-area: login;
+  background: none;
+  border: none;
+}
+
+button#login {
+  background: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  padding: 10px;
+  position: relative;
+}
+
+#login svg {
+  color: var(--palette-secondary-main);
+  background-color: transparent;
+}
+
+#login:hover::before {
+  position: absolute;
+  inset: 0;
+  content: " ";
+  border-radius: 50%;
+  background: var(--palette-secondary-main);
+  opacity: .2;
+}

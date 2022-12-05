@@ -22,11 +22,6 @@
         <label id="hamburgerArea">
           <input id="hamburgerButton" type="checkbox" role="button" aria-label="Open Menu" id="hamburgerButton">☰
         </label>
-        <div id="colorScheme">
-          <label for="darkScheme" id="light">☀</label>
-          <input type="checkbox" id="darkScheme">
-          <label for="darkScheme" id="dark">☾</label>
-        </div>
         <form id="searchForm" tabindex="0" action="/search">
           <input type="hidden" name="page" value="1">
           <button id="searchSubmit" aria-label="Search">
@@ -34,7 +29,15 @@
           <input placeholder="Search for a Movie..." id="searchBox" type="text"
             name="searchTerm" required>
         </form>
-
+        <div id="colorScheme">
+          <label for="darkScheme" id="light">☀</label>
+          <input type="checkbox" id="darkScheme">
+          <label for="darkScheme" id="dark">☾</label>
+        </div>
+        <form id="loginForm" action="/login">
+          <input type="hidden" name="next">
+          <button id="login"><h0-include src="/icons/login.svg"></h0-include></button>
+        </form>
       </header>
         <nav>
           <a class="logo" href="/?categpry=popular&page=1">
