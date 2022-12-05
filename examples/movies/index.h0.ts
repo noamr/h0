@@ -79,6 +79,7 @@ interface Model {
   categories: typeof categories;
   config: TMDBConfig;
   person?: Person;
+  loggedIn: boolean;
 }
 
 interface TMDBConfig {
@@ -95,6 +96,7 @@ export const scope = "/";
 
 let genres = null as null | Promise<Genre[]>;
 let config = null as null | Promise<TMDBConfig>;
+
 export async function fetchModel(request: Request) : Promise<Response> {
   const {TMDB_API_KEY} = process.env;
   if (!TMDB_API_KEY) {
@@ -109,6 +111,9 @@ export async function fetchModel(request: Request) : Promise<Response> {
     const res = await fetch(url.href, {mode: "cors", ...init});
     return res.json() as Promise<Res>;
   }
+
+  const cookie = request.headers.get("Cookie");
+  const session_id = cookie ? cookie.match(/tmdb_session_id\=([a-z0-9]+)/)?.[1] : null;
 
   if (!config)
     config = tmdb<TMDBConfig>("/configuration");
@@ -137,15 +142,8 @@ export async function fetchModel(request: Request) : Promise<Response> {
     subtitle: "",
     page: 1,
     totalPages: 1,
-    session_id: ""
+    loggedIn: !!session_id
   };
-
-  if (url.searchParams.get("approved") === "true" && url.searchParams.has("request_token")) {
-    const request_token = url.searchParams.get("request_token")!;
-    const {session_id} = await tmdb<{session_id: string}>("/authentication/session/new", {}, {method: "post"});
-    defaultModel.session_id = session_id;
-  }
-
 
   switch (url.pathname) {
     case "/": {
@@ -248,6 +246,14 @@ export async function fetchModel(request: Request) : Promise<Response> {
       return Response.redirect(tmdb_auth.toString());
      }
 
+     case "/logout": {
+      return new Response("", {status: 302, headers: {
+        "Location": request.headers.get("referer") || "/",
+        "Set-Cookie": `tmdb_session_id=`
+      }});
+
+     }
+
      case "/auth": {
       const request_token = url.searchParams.get("request_token");
       const approved = !!url.searchParams.get("approved");
@@ -290,10 +296,13 @@ export async function renderView(response: Response, root: Element) {
     return path ? `${model.config.images.secure_base_url}/w${width}${path}` : '/nothing.svg';
   }
 
-  const {page, totalPages, title, subtitle, movies, url, searchTerm, movie, person} = model;
+  console.log(model)
+
+  const {page, totalPages, title, subtitle, movies, url, searchTerm, movie, person, loggedIn} = model;
   root.querySelector("head title")!.innerHTML = model.docTitle;
   const urlRecord = new URL(url);
   root.querySelector("body")!.dataset.path = urlRecord.pathname;
+  root.querySelector("body")!.classList.toggle("logged-in", loggedIn);
   const next = page < totalPages ? new URL(url) : null;
   const prev = page > 1 ? new URL(url) : null;
   if (next)

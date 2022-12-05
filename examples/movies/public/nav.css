@@ -16,7 +16,7 @@ a.logo {
   margin: 16px 8px;
 }
 
-nav h3 {
+nav#sideNav h3 {
   font-weight: var(--font-weight-bold);
   font-size: 1.25rem;
   color: var(--palette-text-primary);
@@ -25,7 +25,7 @@ nav h3 {
   margin: 0 0 1rem 1rem;
 }
 
-nav h3:not(:first-of-type) {
+nav#sideNav h3:not(:first-of-type) {
   margin-top: 4rem;
 }
 
@@ -34,7 +34,7 @@ nav h3:not(:first-of-type) {
   height: 3rem;
 }
 
-nav {
+nav#sideNav {
   max-width: 250px;
   left: 0;
   top: 0;
@@ -48,7 +48,7 @@ nav {
   background-color: var(--palette-background-paper);
 }
 
-nav ul {
+nav#sideNav ul {
   outline: none;
   display: block;
   font-size: 1.25rem;
@@ -57,22 +57,22 @@ nav ul {
   list-style: none;
 }
 
-nav ul a {
+nav#sideNav ul a {
   color: var(--palette-primary-main);
   display: flex;
   gap: 10px;
   margin-bottom: 1.2rem;
 }
 
-nav ul a svg {
+nav#sideNav ul a svg {
   width: 16px;
 }
 
-nav ul a:current {
+nav#sideNav ul a:current {
   color: var(--palette-secondary-main);
 }
 
-nav ul a * {
+nav#sideNav ul a * {
   pointer-events: none;
 }
 
@@ -118,7 +118,7 @@ main {
     max-height: unset;
   }
 
-  body:has(#hamburgerButton:checked) nav {
+  body:has(#hamburgerButton:checked) nav#sideNav {
     transform: none;
   }
 
@@ -126,7 +126,7 @@ main {
     visibility: hidden;
   }
 
-  nav {
+  nav#sideNav {
     position: fixed;
     transform: translateX(-100%);
   }

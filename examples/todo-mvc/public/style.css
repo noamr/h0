@@ -6,7 +6,7 @@
     display: none;
 }
 
-nav a:target {
+nav#sideNav a:target {
     border-color: #CE4646;
 }
 
@@ -165,7 +165,7 @@ form.task input[name="title"]:not(:read-only) {
 	flex-basis: 100px;
 }
 
-nav {
+nav#sideNav {
 	justify-content: center;
 	display: flex;
 	flex: 1;
@@ -181,7 +181,7 @@ input[name="clearCompleted"]:hover {
 	text-decoration: underline;
 }
 
-nav a {
+nav#sideNav a {
 	color: inherit;
 	margin: 3px;
 	padding: 3px 7px;
@@ -190,7 +190,7 @@ nav a {
 	border-radius: 3px;
 }
 
-.nav a:hover {
+nav#sideNav a:hover {
 	border-color: #DB7676;
 }
 

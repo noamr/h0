@@ -38,8 +38,24 @@
           <input type="hidden" name="next">
           <button id="login"><h0-include src="/icons/login.svg"></h0-include></button>
         </form>
+        <label id="userArea">
+          <button id="user"><h0-include src="/icons/account-circle.svg"></h0-include></button>
+          <nav id="userMenu">
+            <ul>
+              <li>
+                <a href="/newlist">Create New List</a>
+              </li>
+              <li>
+                <a href="/mylists">My Lists</a>
+              </li>
+              <li>
+                <a href="/logout">Log out</a>
+              </li>
+            </ul>
+          </nav>
+        </label>
       </header>
-        <nav>
+        <nav id="sideNav">
           <a class="logo" href="/?categpry=popular&page=1">
             <img
               class='logo-img'

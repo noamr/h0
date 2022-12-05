@@ -108,8 +108,16 @@ header {
   margin: 0 4px;
 }
 
-#login {
+#login, #userArea {
   grid-area: login;
+}
+
+body.logged-in #login {
+  display: none;
+}
+
+body:not(.logged-in) #userArea {
+  display: none;
 }
 
 #dark, #light {
@@ -176,13 +184,51 @@ header {
   border: none;
 }
 
-button#login {
+button#login, #userArea button {
   background: none;
   appearance: none;
   border: none;
   outline: none;
   padding: 10px;
   position: relative;
+}
+
+#userArea button svg {
+  color: var(--palette-secondary-main);
+
+}
+
+#userArea {
+  position: relative;
+}
+
+#userMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--palette-background-paper);
+  box-shadow: var(--box-shadow-1);
+  min-width: 160px;
+  visibility: hidden;
+}
+
+#userMenu a {
+  color: var(--palette-text-primary);
+  font-size: 1.5rem;
+  padding: 0 16px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+#userMenu li {
+  white-space: nowrap;
+  padding: 4px;
+}
+
+#userArea:is(:focus-within, :hover) #userMenu {
+  visibility: visible;
 }
 
 #login svg {

@@ -264,7 +264,7 @@ header {
   grid-area: 1 / 2 / 2 / 3;
 }
 
-nav {
+nav#sideNav {
   grid-area: 1 / 1 / 3 / 2;
 }
 
