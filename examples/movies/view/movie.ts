@@ -17,9 +17,9 @@ export function renderMovie(root: HTMLElement, model: Model) {
   artwork.setAttribute("alt", `Poster for ${movie.title}`);
   movieRoot.querySelector(".rating")!.setAttribute("style", `--rating: ${movie.vote_average}`);
   movieRoot.querySelector("#additionalInfo")!.innerHTML = `${languageDisplayNames.of(movie.original_language)} / ${movie.runtime} min / ${new Date(movie.release_date).getFullYear()}`;
-  movieRoot.querySelector("a#imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
-  movieRoot.querySelector("a#website")!.setAttribute("href", movie.homepage || "#");
-  movieRoot.querySelector("a#trailer")!.setAttribute("href", movie.trailer || "#");
+  movieRoot.querySelector("a.imdb")!.setAttribute("href", movie.imdb_id ? `https://www.imdb.com/title/${movie.imdb_id}` : "");
+  movieRoot.querySelector("a.website")!.setAttribute("href", movie.homepage || "#");
+  movieRoot.querySelector("a.trailer")!.setAttribute("href", movie.trailer || "#");
   reconcileChildren<Person>({
     model: arrayModel(movie.cast! || [], "id"),
     view: templateView({

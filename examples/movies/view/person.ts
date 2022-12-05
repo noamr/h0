@@ -12,6 +12,6 @@ export function renderPerson(root: HTMLElement, model: Model) {
   const artwork = personRoot.querySelector(".artwork")! as HTMLImageElement;
   artwork.setAttribute("src", imageURL(model, person.profile_path, 500));
   artwork.setAttribute("alt", person.name);
-  personRoot.querySelector("a#imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/${person.imdb_id}` : "#");
-  personRoot.querySelector("a#website")!.setAttribute("href", person.homepage || "#");
+  personRoot.querySelector("a.imdb")!.setAttribute("href", person.imdb_id ? `https://www.imdb.com/name/${person.imdb_id}` : "#");
+  personRoot.querySelector("a.website")!.setAttribute("href", person.homepage || "#");
 }

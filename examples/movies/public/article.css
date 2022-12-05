@@ -204,7 +204,7 @@ article p#synopsys {
   }
 }
 
-#ads {
+.ads {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -227,11 +227,11 @@ article p#synopsys {
   }
 }
 
-#ads a[href="#"] {
+.ads a[href="#"] {
   display: none;
 }
 
-#ads a {
+.ads a {
   padding: 6px 16px;
   color: var(--palette-primary-main);
   font-size: 1.5rem;
@@ -243,7 +243,7 @@ article p#synopsys {
   align-items: center;
   justify-content: space-between;
 }
-#ads a svg {
+.ads a svg {
   height: 1.5rem;
   margin-left: 1rem;
 }
