@@ -41,3 +41,5 @@ for (const p of runOptions.public || []) {
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 })
+
+globalThis.RUNTIME = "node";

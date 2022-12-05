@@ -2,7 +2,7 @@ import {randomUUID} from "crypto";
 import {tmpdir} from "os";
 import {writeFileSync, rmSync, readFileSync} from "fs";
 import {H0Spec} from "./h0";
-import {resolve} from "path";
+import {resolve, dirname} from "path";
 import { BuildOptions, buildSync } from "esbuild";
 import {DOMParser} from "linkedom";
 
@@ -32,11 +32,37 @@ export function buildClientBundle(indexModule: string, outDir: string, buildOpti
   rmSync(tmp);
 }
 
+function resolveStyleInlcudes(root: string, href: string): string {
+  const cur = resolve(root, href);
+  const style = readFileSync(cur, "utf-8");
+  const importRegex = /(^|\n)\@import \"(?<href>[^\"]+)\"/;
+  return `/* @import "${href}" */` +
+    style.split("\n").map(row => {
+    const imports = row.match(importRegex);
+    if (!imports)
+      return row;
+
+    const newHref = imports.groups?.href;
+    if (!newHref)
+      return row;
+    const base = newHref.startsWith("/") ? root : cur;
+    return resolveStyleInlcudes(root, resolve(dirname(base), newHref));
+  }).join("\n");
+
+}
+
 export function resolveIncludes(templateHTML: string, templateRoot: string) {
   const document = new DOMParser().parseFromString(templateHTML, "text/html");
   for (const includeElement of document.querySelectorAll("h0-include[src]")) {
       const includePath = resolve(templateRoot, "public", "./" + includeElement.getAttribute("src")!);
       includeElement.outerHTML = readFileSync(includePath, "utf-8");
+  }
+  for (const link of document.querySelectorAll("link[rel=stylesheet][h0-opt=inline][href]")) {
+    const style = document.createElement("style");
+    const href = link.getAttribute("href");
+    const pubRoot = resolve(templateRoot, "public");;
+    style.innerHTML = resolveStyleInlcudes(pubRoot, href);
+    (link as Element).replaceWith(style as any as Node);
   }
   return document.toString();
 }

@@ -3,15 +3,13 @@ import {Genre, TMDBConfig, categories} from "../types";
 const TMDB_API_VERSION = 3;
 const TMDB_API_BASE_URL = 'https://api.themoviedb.org';
 
-const {TMDB_API_KEY} = process.env;
-if (!TMDB_API_KEY) {
-  throw new Error('Missing TMDB_API_KEY in env');
-}
-
-const genres = tmdb<{genres: Genre[]}>("/genre/movie/list").then(result => result.genres);
-const config = tmdb<TMDBConfig>("/configuration");
 
 export async function tmdb<Res>(path: string, params: {[key: string]: string | number} = {}, init?: RequestInit) {
+  const {TMDB_API_KEY} = process.env;
+  if (!TMDB_API_KEY) {
+    throw new Error('Missing TMDB_API_KEY in env');
+  }
+
   const url = new URL(TMDB_API_BASE_URL);
   url.pathname = `/${TMDB_API_VERSION}${path}`;
   for (const k in params)
@@ -26,10 +24,12 @@ export async function getDefaultModel(request: Request) {
   const session_id = cookie ? cookie.match(/tmdb_session_id\=([a-z0-9]+)/)?.[1] : null;
   const url = new URL(request.url);
   const page = Number(url.searchParams.get("page") || "1");
+  const [genres, config] = await Promise.all([tmdb<{genres: Genre[]}>("/genre/movie/list").then(result => result.genres),
+     tmdb<TMDBConfig>("/configuration")]);
 
   return {
-    genres: await genres,
-    config: await config,
+    genres,
+    config,
     categories,
     url: request.url,
     movies: [],

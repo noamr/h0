@@ -1,7 +1,6 @@
 import { login, logout, respondToAuth } from "./auth";
 import { getCategory, getGenre, getMovie, getPerson, search } from "./content";
 
-
 export async function fetchModel(request: Request) : Promise<Response | null> {
   const url = new URL(request.url);
 
