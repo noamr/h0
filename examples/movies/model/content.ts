@@ -1,4 +1,4 @@
-import {Movie, Person, Credits, categories, MoviesResult, Model} from "./types";
+import {Movie, Person, Credits, categories, MoviesResult, Model} from "../types";
 import {tmdb, getDefaultModel} from "./api";
 
 export async function getCategory(request: Request) {
