@@ -2,10 +2,10 @@ import {reconcileChildren, templateView} from "../../../src/reconcile";
 import {Movie, Model} from "../types";
 import {imageURL} from "./util";
 
-export function renderMovieList(root: HTMLElement, model: Model) {
+export function renderMovieList(root: HTMLElement, model: Model, movies?: Movie[], selector?: string) {
   reconcileChildren<Movie>({
     view: templateView({
-      container: root.querySelector("#movieList")!,
+      container: root.querySelector(selector || "#movieList")!,
       template: root.querySelector("#movieTemplate") as HTMLTemplateElement,
       keyAttribute: "id",
       updateItem: (element: Element, movie: Movie, key, index) => {
@@ -19,7 +19,7 @@ export function renderMovieList(root: HTMLElement, model: Model) {
       }
     }),
     model: {
-      entries: model.movies,
+      entries: movies || model.movies,
       getKey: m => String(m.id),
       getValue: m => m
     }

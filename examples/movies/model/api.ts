@@ -16,12 +16,17 @@ export async function tmdb<Res>(path: string, params: {[key: string]: string | n
     url.searchParams.set(k, String(params[k]));
   url.searchParams.set("api_key", TMDB_API_KEY!);
   const res = await fetch(url.href, {mode: "cors", ...init});
-  return res.json() as Promise<Res>;
+  const json = res.json() as Promise<Res>;
+  console.log(path, await json);
+  return json;
+}
+
+export function getSessionID(request: Request) {
+  const cookie = request.headers.get("Cookie");
+  return cookie ? cookie.match(/tmdb_session_id\=([a-z0-9]+)/)?.[1] : null;
 }
 
 export async function getDefaultModel(request: Request) {
-  const cookie = request.headers.get("Cookie");
-  const session_id = cookie ? cookie.match(/tmdb_session_id\=([a-z0-9]+)/)?.[1] : null;
   const url = new URL(request.url);
   const page = Number(url.searchParams.get("page") || "1");
   const [genres, config] = await Promise.all([tmdb<{genres: Genre[]}>("/genre/movie/list").then(result => result.genres),
@@ -37,6 +42,6 @@ export async function getDefaultModel(request: Request) {
     subtitle: "",
     page: +page,
     totalPages: 1,
-    loggedIn: !!session_id
+    loggedIn: !!getSessionID(request)
     };
 }

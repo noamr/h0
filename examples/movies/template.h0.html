@@ -40,7 +40,7 @@
                 <a href="/newlist">Create New List</a>
               </li>
               <li>
-                <a href="/mylists">My Lists</a>
+                <a href="/my-lists">My Lists</a>
               </li>
               <li>
                 <a href="/logout">Log out</a>
@@ -123,6 +123,10 @@
             <a href="#" id="next" aria-label="Next"><h0-include src="icons/next.svg"></h0-include></a>
           </div>
         </section>
+        <section id="lists">
+          <ul id="listOfLists">
+          </ul>
+        </section>
       </main>
       <template id="movieTemplate">
         <li>
@@ -150,6 +154,13 @@
           <img width="45" height="45">
         </a>
       </li>
+      </template>
+      <template id="listTemplate">
+        <li>
+          <h3></h3>
+          <h4></h4>
+          <ul class="listMovies"></ul>
+        </li>
       </template>
     </body>
   </html>

@@ -1,5 +1,6 @@
 import { login, logout, respondToAuth } from "./auth";
 import { getCategory, getGenre, getMovie, getPerson, search } from "./content";
+import { getLists } from "./lists";
 
 export async function fetchModel(request: Request) : Promise<Response | null> {
   const url = new URL(request.url);
@@ -12,6 +13,7 @@ export async function fetchModel(request: Request) : Promise<Response | null> {
     "/person": getPerson,
     "/login": login,
     "/auth": respondToAuth,
+    "/my-lists": getLists,
     "/logout": logout
   } as {[key: string]: (req: Request) => Promise<Response | null>};
 

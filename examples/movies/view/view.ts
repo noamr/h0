@@ -7,6 +7,7 @@ import { renderMovieList } from "./movies";
 import { renderGenreList } from "./genres";
 import { renderPagination } from "./pagination";
 import { renderHeader } from "./header";
+import { renderLists } from "./lists";
 
 export async function renderView(response: Response, element: Element) {
   const root = element as HTMLElement;
@@ -21,6 +22,7 @@ export async function renderView(response: Response, element: Element) {
   renderMovieList(root, model);
   renderGenreList(root, "ul#genreList", model.genres);
   renderPagination(root, model);
+  renderLists(root, model);
 }
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {

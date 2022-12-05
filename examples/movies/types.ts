@@ -70,6 +70,7 @@ export interface Model {
   person?: Person;
   loggedIn: boolean;
   searchTerm?: string;
+  lists?: MovieList[];
 }
 
 export interface TMDBConfig {
@@ -82,3 +83,9 @@ export interface TMDBConfig {
   }
 }
 
+export interface MovieList {
+  id: number;
+  name: string;
+  description: string;
+  items: Movie[];
+}
