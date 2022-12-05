@@ -34,7 +34,7 @@ export async function renderView(response: Response, root: Element) {
   renderMovie(root as HTMLElement, model);
   renderPerson(root as HTMLElement, model);
   renderMovieList(root as HTMLElement, model);
-  renderGenreList(root, "ul#genreList", model.genres);
+  renderGenreList(root as HTMLElement, "ul#genreList", model.genres);
 }
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
