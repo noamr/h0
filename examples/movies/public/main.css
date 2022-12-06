@@ -21,7 +21,7 @@ a.poster {
   align-items: center;
 }
 
-#movieList a.poster:hover {
+ul:is(#movieList, .listMovies) a.poster:hover {
   transform: scale(1.03);
   background-color: var(--palette-background-paper);
   box-shadow: var(--box-shadow-1);
@@ -106,4 +106,16 @@ a.poster h3 {
 
 main {
   scroll-behavior: smooth;
+}
+
+body:not([data-path="/my-lists"]) #listOfLists {
+  display: none;
+}
+
+ul.listMovies {
+  display: flex;
+  max-width: 70vw;
+  overflow-x: scroll;
+  overflow-y: auto;
+  gap: 2rem;
 }

@@ -37,7 +37,9 @@ export function initClient(spec: H0Spec, context: Window = window) {
             }
             h0.dispatchEvent(new Event("navigate"));
             break;
-
+        case 201:
+            navigate(location.href, "transparent");
+            break;
         case 302:
             navigate(response.headers.get("Location")!, "replace");
             break;
@@ -47,7 +49,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
     }
 
     function navigate(info: RequestInfo, historyMode: HistoryMode) {
-        const req = new Request(info);
+        const req = info instanceof Request ? info : new Request(info);
         const {pathname} = new URL(req.url);
         if (!pathname.startsWith(scope))
             return false;
@@ -60,6 +62,9 @@ export function initClient(spec: H0Spec, context: Window = window) {
         const body : FormData | null = new FormData(form);
         const method = (submitter?.getAttribute("formmethod") || form.method || "GET").toUpperCase();
         const action = submitter?.getAttribute("formaction") || form.action;
+        if (submitter && submitter.hasAttribute("name") && submitter.hasAttribute("value"))
+            body.set(submitter.getAttribute("name")!, submitter.getAttribute("value")!);
+
         const historyMode = action === location.href ? "replace" : "push";
         if (method === "POST")
             return navigate(new Request(action, {body, method}), historyMode);

@@ -89,3 +89,9 @@ export interface MovieList {
   description: string;
   items: Movie[];
 }
+
+export interface Account {
+  id: string;
+  name: string;
+  username: string;
+}

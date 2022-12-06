@@ -66,14 +66,14 @@ header form:focus-within #searchSubmit {
 }
 
 @media only screen and (max-width: 1300px) {
-  form {
+  form#searchForm {
     border: 1px solid transparent;
     background-color: var(--palette-secondary-main);
   }
 }
 
 @media (max-width: 600px) {
-  form {
+  form#searchForm {
     max-width: 22rem;
   }
 }

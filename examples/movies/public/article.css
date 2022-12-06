@@ -103,6 +103,7 @@ article#movie {
     "artwork synopsys synopsys synopsys"
     "artwork cast-h cast-h cast-h"
     "artwork cast cast cast"
+    "artwork actions actions actions"
     "artwork ads ads ads";
 }
 
@@ -129,6 +130,7 @@ article#person {
       "synopsys synopsys"
       "cast-h cast-h"
       "cast cast"
+      "actions actions"
       "ads ads"
   }
 }
@@ -178,6 +180,16 @@ article #additionalInfo {
   text-transform: uppercase;
   grid-area: info
 }
+
+article #movieListActions {
+  grid-area: actions;
+}
+
+article #movieListActions form {
+  display: flex;
+}
+
+
 
 article p#synopsys {
   padding-right: 4rem;
@@ -231,9 +243,8 @@ article p#synopsys {
   display: none;
 }
 
-.ads a {
+.ads a, #movieListActions button {
   padding: 6px 16px;
-  color: var(--palette-primary-main);
   font-size: 1.5rem;
   display: flex;
   border: 1px solid currentColor;
@@ -242,7 +253,17 @@ article p#synopsys {
   border-radius: 8px;
   align-items: center;
   justify-content: space-between;
+  color: var(--palette-primary-main);
 }
+
+
+#movieListActions button {
+  background: none;
+  border: 1px solid var(--palette-secondary-main);
+  color: var(--palette-secondary-main);
+  display: flex;
+}
+
 .ads a svg {
   height: 1.5rem;
   margin-left: 1rem;

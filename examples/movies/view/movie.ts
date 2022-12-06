@@ -1,5 +1,5 @@
 import { reconcileChildren, arrayModel, templateView } from "../../../src/reconcile";
-import { Model, Person } from "../types";
+import { Model, MovieList, Person } from "../types";
 import { languageDisplayNames, imageURL } from "./util";
 import { renderGenreList } from "./genres";
 export function renderMovie(root: HTMLElement, model: Model) {
@@ -7,7 +7,7 @@ export function renderMovie(root: HTMLElement, model: Model) {
   if (!movie)
     return;
 
-    const movieRoot = root.querySelector("article#movie")!;
+  const movieRoot = root.querySelector("article#movie")!;
   movieRoot.querySelector("h1")!.innerHTML = movie.title;
   movieRoot.querySelector("h2")!.innerHTML = movie.tagline;
   renderGenreList(root, "ul#movieGenresList", movie.genres || []);
@@ -34,5 +34,21 @@ export function renderMovie(root: HTMLElement, model: Model) {
         anchor.setAttribute("href", `/person?id=${person.id}`);
       }
     })
-  })  
+  });
+
+  reconcileChildren<MovieList>({
+    model: arrayModel(model.lists || [], "id"),
+    view: {
+      container: movieRoot.querySelector("#movieListActions form")!,
+      keyAttribute: "data-list-id",
+      createItem: (doc: Document) => doc.createElement("button"),
+      updateItem: (button: Element, {id, name, items}: MovieList) => {
+        const action = items.find(m => m.id === movie.id) ? "remove" : "add";
+        button.setAttribute("formaction", `/list/${action}?list_id=${id}`);
+        button.setAttribute("value", String(movie.id));
+        button.setAttribute("name", "movie_id");
+        button.innerHTML = `${action === "add" ? "Add to" : "Remove from"} ${name}`;
+      }
+    }
+  });
 }

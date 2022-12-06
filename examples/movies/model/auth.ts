@@ -1,4 +1,4 @@
-import { tmdb } from "./api";
+import { tmdb, tmdb_post } from "./api";
 
 export async function logout(request: Request) {
   return new Response("", {status: 302, headers: {
@@ -33,8 +33,7 @@ export async function login(request: Request) {
   if (!approved)
     return Response.redirect(next);
 
-  const {session_id, success} = await tmdb<{success: true, session_id: string}>("/authentication/session/new", {},
-  {method: "post", body: JSON.stringify({request_token}), headers: {"Content-Type": "application/json"}});
+  const {session_id, success} = await tmdb_post<{success: true, session_id: string}>("/authentication/session/new", {}, {request_token});
 
   if (!success)
     return Response.redirect(next);

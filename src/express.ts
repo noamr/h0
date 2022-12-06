@@ -7,6 +7,7 @@ import { buildClientBundle, resolveIncludes } from "./build";
 import { createServeFunction } from "./serve";
 import os from "os"
 import {randomUUID} from "crypto";
+import bodyParser from "body-parser";
 
 interface ServerConfig {
     templateHTML: string
@@ -52,6 +53,7 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
     const tmpdir = `${os.tmpdir}/h0-${randomUUID()}`;
     mkdirSync(tmpdir);
     buildClientBundle(indexModule, tmpdir, options?.esbuild);
+    expressRouter.use(bodyParser.raw({type: "*/*"}));
 
     expressRouter.use(resolve(scope, ".h0"), Express.static(tmpdir, {fallthrough: true}));
 
@@ -59,7 +61,11 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         const headers = new Headers;
         for (const header in req.headers)
             headers.set(header, req.headers[header] as string);
-        const fetchRequest = new Request(new URL(req.url, `${req.protocol}://${req.headers.host}`), {method: req.method, body: req.body, headers});
+        console.log({req: req});
+        let body = req.method === "GET" ? null : req.body;
+
+        console.log({body});
+        const fetchRequest = new Request(new URL(req.url, `${req.protocol}://${req.headers.host}`), {method: req.method, body, headers, duplex: "half"});
         const url = new URL(fetchRequest.url);
         if (!url.pathname.startsWith(scope)) {
             next();
