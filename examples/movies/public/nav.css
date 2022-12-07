@@ -98,7 +98,7 @@ main {
 main {
   padding-top: 6rem;
   padding-bottom: 6rem;
-  overflow: scroll;
+  overflow: auto;
   max-height: 100vh;
 }
 
