@@ -7,14 +7,28 @@ export function initClient(spec: H0Spec, context: Window = window) {
     if (!rootElement)
         throw new Error(`Root element not found`);
 
-    const h0 = new EventTarget() as H0Navigator;
+    class H0NavigatorImpl extends EventTarget implements H0Navigator {
+        navigate(info: RequestInfo, historyMode: HistoryMode) {
+            const req = info instanceof Request ? info : new Request(info);
+            const {pathname} = new URL(req.url);
+            if (!pathname.startsWith(scope))
+                return false;
+
+            fetchModel(req).then(response => respond(req.url, response, historyMode));
+            return true;
+        }
+        reload() { return this.navigate(scope, "transparent"); }
+    };
+
+    const h0 = new H0NavigatorImpl();
+
     (rootElement as HTMLElement).addEventListener("submit", (e: SubmitEvent) => {
         if (submitForm(e.target as HTMLFormElement, e.submitter))
             e.preventDefault();
     }, {capture: true});
 
     (rootElement as HTMLElement).addEventListener("click", async (e: MouseEvent) => {
-        if ((e.target instanceof HTMLAnchorElement) && navigate((e.target as HTMLAnchorElement).href, "push"))
+        if ((e.target instanceof HTMLAnchorElement) && h0.navigate((e.target as HTMLAnchorElement).href, "push"))
             e.preventDefault();
     }, {capture: true});
 
@@ -38,24 +52,14 @@ export function initClient(spec: H0Spec, context: Window = window) {
             h0.dispatchEvent(new Event("navigate"));
             break;
         case 201:
-            navigate(location.href, "transparent");
+            h0.navigate(location.href, "transparent");
             break;
         case 302:
-            navigate(response.headers.get("Location")!, "replace");
+            h0.navigate(response.headers.get("Location")!, "replace");
             break;
         default:
             break;
         }
-    }
-
-    function navigate(info: RequestInfo, historyMode: HistoryMode) {
-        const req = info instanceof Request ? info : new Request(info);
-        const {pathname} = new URL(req.url);
-        if (!pathname.startsWith(scope))
-            return false;
-
-        fetchModel(req).then(response => respond(req.url, response, historyMode));
-        return true;
     }
 
     function submitForm(form: HTMLFormElement, submitter?: HTMLElement | null) {
@@ -67,17 +71,15 @@ export function initClient(spec: H0Spec, context: Window = window) {
 
         const historyMode = action === location.href ? "replace" : "push";
         if (method === "POST")
-            return navigate(new Request(action, {body, method}), historyMode);
+            return h0.navigate(new Request(action, {body, method}), historyMode);
 
         const url = new URL(action);
         for (const [k, v] of body)
             url.searchParams.append(k, v.toString());
-        return navigate(url.href, historyMode);
+        return h0.navigate(url.href, historyMode);
     }
 
-    function reload() { return navigate(scope, "transparent"); }
-    Object.assign(h0, {navigate, reload});
-    navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
+    h0.navigate(location.pathname.startsWith(scope) ? location.href : scope, "replace");
     if (RUNTIME === "window") {
         mount?.(rootElement as HTMLElement, {window: context, h0});
         h0.dispatchEvent(new Event("navigate"));
