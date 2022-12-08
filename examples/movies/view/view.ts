@@ -8,20 +8,32 @@ import { renderPagination } from "./pagination";
 import { renderHeader } from "./header";
 import { renderLists } from "./lists";
 
-export async function renderView(response: Response, element: Element) {
-  const root = element as HTMLElement;
-  const model = (await response.json()) as Model;
+function renderGeneralDocumentStuff(root: HTMLElement, model: Model) {
   root.querySelector("head title")!.innerHTML = model.docTitle;
   root.querySelector("body")!.dataset.path =  new URL(model.url).pathname;
   root.querySelector("body")!.classList.toggle("logged-in", model.loggedIn);
+}
 
-  renderHeader(root, model);
-  renderMovie(root, model);
-  renderPerson(root, model);
-  renderMovieList(root, model);
+function renderNav(root: HTMLElement, model: Model) {
   renderGenreList(root, "ul#genreList", model.genres);
-  renderPagination(root, model);
-  renderLists(root, model);
+}
+
+export async function renderView(response: Response, element: Element) {
+  const root = element as HTMLElement;
+  const model = (await response.json()) as Model;
+  for (const renderer of [
+      renderGeneralDocumentStuff,
+      renderHeader,
+      renderNav,
+      renderMovieList,
+      renderPagination,
+
+      renderMovie,
+      renderPerson,
+      renderLists
+  ]) {
+    renderer(root, model);
+  }
 }
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
