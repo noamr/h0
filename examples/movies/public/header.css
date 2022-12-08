@@ -29,7 +29,9 @@ header form#searchForm {
 }
 
 #searchForm:not(:focus-within) #searchBox {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  inset: 0;
 }
 
 header #searchForm:focus-within {
