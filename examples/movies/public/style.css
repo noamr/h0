@@ -255,6 +255,7 @@ body[data-path="/person"] article {
 }
 
 body {
+  height: 100vh;
   display: grid;
   grid-template-columns: max-content 1fr;
   grid-template-rows: max-content 1fr;
