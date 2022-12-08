@@ -41,7 +41,6 @@ header #searchForm:focus-within {
 }
 
 #searchSubmit {
-  pointer-events: none;
   cursor: none;
   background-color: transparent;
   border: none;
