@@ -7,6 +7,7 @@ export type HistoryMode = "push" | "replace" | "transparent";
 
 export interface H0Navigator extends EventTarget {
     navigate(info: RequestInfo, historyMode: HistoryMode): boolean;
+    submitForm(form: HTMLFormElement, submitter?: HTMLElement | null): boolean;
     reload(): void;
 }
 

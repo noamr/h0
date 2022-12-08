@@ -25,15 +25,6 @@ export async function renderView(response: Response, element: Element) {
 }
 
 export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
-  // Refresh data on "Back"
-  window.addEventListener("popstate", () => h0.navigate(window.location.href, "transparent"));
-
-  /*
-  // Focus search box when form is focused
-  const searchForm = root.querySelector("#searchForm")!;
-  const searchBox = root.querySelector("input#searchBox")! as HTMLElement;
-  searchForm.addEventListener("focus", () => searchBox.focus());
-*/
   // Scroll to top when navigating
   h0.addEventListener("navigate", () => root.querySelector("main")!.scrollTo(0, 0));
 }
