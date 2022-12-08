@@ -15,12 +15,13 @@ export async function login(request: Request) {
       "Content-Type": "application/json"
     }, status: 403});
   }
-  const next = url.searchParams.get("next")!;
+  const next = url.searchParams.get("next") || new URL("/", url);
   const auth = new URL(`/auth`, next);
-  auth.searchParams.set("next", next);
+  auth.searchParams.set("next", next.toString());
   auth.searchParams.set("expires_at", expires_at);
   const tmdb_auth = new URL(`https://www.themoviedb.org/authenticate/${request_token}`);
   tmdb_auth.searchParams.set("redirect_to", auth.toString());
+  console.log(tmdb_auth.toString());
   return Response.redirect(tmdb_auth.toString());
  }
 

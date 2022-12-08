@@ -33,7 +33,7 @@ export function initClient(spec: H0Spec, context: Window = window) {
     }, {capture: true});
 
     async function respond(url: string, response: Response | null, historyMode: HistoryMode) {
-        if (!response) {
+        if (!response || response.type === "opaqueredirect") {
             location.href = url;
             return;
         }
