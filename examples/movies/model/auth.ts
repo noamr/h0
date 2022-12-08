@@ -21,7 +21,6 @@ export async function login(request: Request) {
   auth.searchParams.set("expires_at", expires_at);
   const tmdb_auth = new URL(`https://www.themoviedb.org/authenticate/${request_token}`);
   tmdb_auth.searchParams.set("redirect_to", auth.toString());
-  console.log(tmdb_auth.toString());
   return Response.redirect(tmdb_auth.toString());
  }
 

@@ -16,7 +16,7 @@ export async function tmdb<Res>(path: string, params: {[key: string]: string | n
   url.searchParams.set("api_key", TMDB_API_KEY!);
   const res = await fetch(url.href, {mode: "cors", ...init});
   const json = res.json() as Promise<Res>;
-  console.log(path, await json);
+  console.info(path, await json);
   return json;
 }
 

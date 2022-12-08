@@ -61,10 +61,8 @@ export function router({templateHTML, indexModule, publicFolders, options}: Serv
         const headers = new Headers;
         for (const header in req.headers)
             headers.set(header, req.headers[header] as string);
-        console.log({req: req});
         let body = req.method === "GET" ? null : req.body;
 
-        console.log({body});
         const fetchRequest = new Request(new URL(req.url, `${req.protocol}://${req.headers.host}`), {method: req.method, body, headers, duplex: "half"});
         const url = new URL(fetchRequest.url);
         if (!url.pathname.startsWith(scope)) {

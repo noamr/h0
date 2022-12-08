@@ -30,7 +30,6 @@ async function addOrRemove(request: Request, op: "add" | "remove") {
 
   if (!listID)
     return new Response("List ID not found", {status: 400});
-  console.log(request);
   const body = await request.formData();
   const movieID = body.get("movie_id");
   if (!movieID)
@@ -40,7 +39,6 @@ async function addOrRemove(request: Request, op: "add" | "remove") {
 }
 
 export async function addToList(request: Request): Promise<Response> {
-  console.log(request);
   return addOrRemove(request, "add");
 }
 

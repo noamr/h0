@@ -10,7 +10,6 @@ interface Model {
 
 export async function renderView(response: Response, root: HTMLElement) {
     const {from, to, symbols, rates} = await response.json() as Model;
-    console.log({from, to, symbols, rates} );
     root.querySelector("#from")!.innerHTML = from;
 
     root.querySelector("#to")!.innerHTML = to;
