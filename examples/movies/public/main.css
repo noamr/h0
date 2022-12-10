@@ -112,7 +112,11 @@ main {
   scroll-behavior: smooth;
 }
 
-body:not([data-path="/my-lists"]) #listOfLists {
+body:not([data-path="/my-lists"]) #lists {
+  display: none;
+}
+
+body[data-path="/my-lists"] #movies {
   display: none;
 }
 
@@ -122,4 +126,35 @@ ul.listMovies {
   overflow-x: scroll;
   overflow-y: auto;
   gap: 2rem;
+}
+
+#listOfLists {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 2rem;
+  padding: 2rem;
+}
+
+.listCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffa869;
+  aspect-ratio: 1/1;
+  border-radius: 1rem;
+  padding: 20px 40px;
+  color: black;
+}
+
+.listCard:hover {
+  box-shadow: var(--box-shadow-3);
+}
+
+.listCard  h2 {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--palette-text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.4;
 }
