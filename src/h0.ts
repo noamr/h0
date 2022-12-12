@@ -12,7 +12,8 @@ export interface H0Navigator extends EventTarget {
 }
 
 export interface H0Spec {
-    fetchModel: ((request: Request) => Promise<Response | null>) & {runtime? : "client-only" | "server-only"};
+    fetchModel: ((request: Request) => Promise<Response | null>);
+    modelRuntime? : "client-only" | "server-only";
     renderView: (response: Response, rootElement: HTMLElement) => void;
     selectRoot: (root: Document) => Element;
     mount(root: HTMLElement, {window, h0}: {window: Window, h0: H0Navigator}): void;

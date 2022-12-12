@@ -24,4 +24,4 @@ export async function fetchModel(request: Request) : Promise<Response | null> {
   return pages[url.pathname](request);
 }
 
-fetchModel.runtime = "server-only";
+export const modelRuntime = "server-only";

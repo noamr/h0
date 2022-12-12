@@ -74,7 +74,7 @@ export async function fetchModel(request: Request) : Promise<Response> {
     }
 }
 
-fetchModel.runtime = "client-only";
+export const modelRuntime = "client-only";
 
 export async function renderView(response: Response, root: Element) {
     const document = root.ownerDocument;

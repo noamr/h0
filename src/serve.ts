@@ -2,7 +2,7 @@ import { H0Spec } from "./h0";
 import { DOMParser } from "linkedom";
 export function createServeFunction(spec: H0Spec, templateHTML: string, {serverSideRendering, stream}: {serverSideRendering: boolean, stream: boolean}) {
   return async function serve(req: Request): Promise<Response | null> {
-      const {fetchModel, renderView, paths} = spec;
+      const {fetchModel, renderView, paths, modelRuntime} = spec;
       const url = new URL(req.url);
 
       globalThis.RUNTIME = "node";
@@ -26,7 +26,7 @@ export function createServeFunction(spec: H0Spec, templateHTML: string, {serverS
 
       const htmlHeaderParams = {headers: {"Content-Type": "text/html; charset=utf-8"}};
 
-      if (!renderView || !serverSideRendering || fetchModel.runtime === "client-only")
+      if (!renderView || !serverSideRendering || modelRuntime === "client-only")
           return new Response(templateHTML, htmlHeaderParams);
 
       const encoder = new TextEncoder();

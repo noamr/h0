@@ -8,9 +8,9 @@ import {DOMParser} from "linkedom";
 
 export function buildClientBundle(indexModule: string, outDir: string, buildOptions: BuildOptions = {}) {
   const spec = require(indexModule) as H0Spec;
-  const {fetchModel} = spec;
+  const {modelRuntime} = spec;
   const tmp = `${tmpdir()}/h0-${randomUUID()}.ts`;
-  const fetchModelOnClient = fetchModel.runtime !== "server-only";
+  const fetchModelOnClient = modelRuntime !== "server-only";
   writeFileSync(tmp, `
       import {initClient} from "${resolve(__dirname, "client.ts")}";
       import {renderView, scope, mount, selectRoot${fetchModelOnClient ? ", fetchModel" : ""}} from "${indexModule}";
@@ -20,6 +20,7 @@ export function buildClientBundle(indexModule: string, outDir: string, buildOpti
 
   buildSync({
       bundle: true,
+      treeShaking: true,
       sourcemap: "linked",
       format: "esm",
       target: "chrome108",
@@ -71,7 +72,7 @@ export function buildVercelMiddleware(folder: string, outFile: string,{serverSid
   const template = readFileSync(resolve(folder, "template.h0.html"), "utf-8");
   const templateWithIncludes = resolveIncludes(template, folder);
   const tmp = `${tmpdir()}/h0-${randomUUID()}.ts`;
-  serverSideRendering = serverSideRendering && spec.fetchModel.runtime !== "client-only";
+  serverSideRendering = serverSideRendering && spec.modelRuntime !== "client-only";
   writeFileSync(tmp, `
       import {createServeFunction} from "${resolve(__dirname, "serve.ts")}";
       import {next} from "@vercel/edge";
