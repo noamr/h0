@@ -6,6 +6,7 @@ interface Model<ValueType, EntryType = ValueType> {
     entries: Iterable<EntryType>;
     getKey: (entry: EntryType, index: number) => string;
     getValue: (entry: EntryType) => ValueType;
+    getHash?: (entry: EntryType) => string;
 }
 
 interface View<ValueType> {
@@ -13,6 +14,7 @@ interface View<ValueType> {
     createItem: CreateItemFunc,
     updateItem: UpdateItemFunc<ValueType>,
     keyAttribute: string
+    hashAttribute?: string
 }
 
 interface ModelMapper<ValueType, EntryType = ValueType> {
@@ -23,8 +25,8 @@ interface ModelMapper<ValueType, EntryType = ValueType> {
 const accounting = new WeakMap<Element | LinkeDom.HTMLElement, Map<string, Element>>();
 
 export function reconcileChildren<V, E = V>({view, model}: ModelMapper<V, E>) {
-    const {entries, getKey, getValue} = model;
-    const {container, createItem, updateItem, keyAttribute} = view;
+    const {entries, getKey, getValue, getHash} = model;
+    const {container, createItem, updateItem, keyAttribute, hashAttribute} = view;
     const itemByKey = accounting.get(container) || new Map<string, Element>();
     const document = container.ownerDocument;
     accounting.set(container, itemByKey);
@@ -32,6 +34,7 @@ export function reconcileChildren<V, E = V>({view, model}: ModelMapper<V, E>) {
     Array.from(entries).forEach((e, i) => {
         const key = getKey(e, i);
         const value = getValue(e);
+        const hash = getHash ? getHash(e) : null;
         let element: Element | LinkeDom.HTMLElement | null = lastElement?.nextElementSibling!;
         if (!element || element.getAttribute(keyAttribute) !== key)
             element = itemByKey.get(key) || null;
@@ -55,7 +58,18 @@ export function reconcileChildren<V, E = V>({view, model}: ModelMapper<V, E>) {
                 container.prepend(element as Element);
         }
 
-        updateItem(element, value, key, i);
+        let shouldUpdate = true;
+
+        if (hash && hashAttribute) {
+            const currentHash = element.getAttribute(hashAttribute);
+            if (currentHash && currentHash !== hash)
+                shouldUpdate = false;
+            if (hashAttribute !== keyAttribute)
+                element.setAttribute(hashAttribute, hash);
+        }
+
+        if (shouldUpdate)
+            updateItem(element, value, key, i);
         lastElement = element;
     });
 
@@ -75,10 +89,11 @@ export function objectModel<V>(object: {[key: string]: V}): Model<V, [string, V]
     }
 }
 
-export function arrayModel<V>(array: V[], key: keyof V): Model<V> {
+export function arrayModel<V>(array: V[], key: keyof V, options?: {hashAttribute: keyof V}): Model<V> {
     return {
         getKey: e => String(e[key]),
         getValue: e => e,
+        getHash: options?.hashAttribute ? (e => String(e[options.hashAttribute])) : undefined,
         entries: array
     }
 }
@@ -93,8 +108,8 @@ export function selectView(container: Element) : View<any> {
 }
 
 
-export function templateView<V>({container, template, keyAttribute, updateItem}:
-        {container: Element, template: Element, keyAttribute?: string, updateItem: UpdateItemFunc<V>}) : View<V> {
+export function templateView<V>({container, template, keyAttribute, hashAttribute, updateItem}:
+        {container: Element, template: Element, keyAttribute?: string, hashAttribute?: string, updateItem: UpdateItemFunc<V>}) : View<V> {
     return {
         container,
         createItem: (document) => {
@@ -111,6 +126,7 @@ export function templateView<V>({container, template, keyAttribute, updateItem}:
             throw new Error("unknown runtime");
         },
         keyAttribute: keyAttribute || "data-id",
+        hashAttribute,
         updateItem
     };
 }

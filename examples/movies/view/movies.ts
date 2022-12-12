@@ -8,6 +8,7 @@ export function renderMovieList(root: HTMLElement, model: Model, movies?: Movie[
       container: root.querySelector(selector || "#movieList")!,
       template: root.querySelector("#movieTemplate") as HTMLTemplateElement,
       keyAttribute: "id",
+      hashAttribute: "id",
       updateItem: (element: Element, movie: Movie, key, index) => {
         element.querySelector("a")!.setAttribute("href", `/movie?id=${movie.id}`);
         element.querySelector(".movieTitle")!.innerHTML = movie.title;
@@ -21,6 +22,7 @@ export function renderMovieList(root: HTMLElement, model: Model, movies?: Movie[
     model: {
       entries: movies || model.movies,
       getKey: m => String(m.id),
+      getHash: m => String(m.id),
       getValue: m => m
     }
   })

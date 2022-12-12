@@ -54,7 +54,9 @@ export function initClient(spec: H0Spec, context: Window = window) {
                         context.history.replaceState(null, "", url);
                         break;
                 }
-                h0.dispatchEvent(new Event("navigate"));
+                setTimeout(() => {
+                    h0.dispatchEvent(new Event("navigate"));
+                }, 0);
                 break;
             case 201:
                 h0.navigate(location.href, "transparent");

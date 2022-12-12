@@ -18,6 +18,13 @@ function renderNav(root: HTMLElement, model: Model) {
   renderGenreList(root, "ul#genreList", model.genres);
 }
 
+function yieldScheduler() {
+  if (typeof requestIdleCallback !== "undefined")
+    return new Promise(resolve => requestIdleCallback(resolve));
+  else if (typeof requestAnimationFrame !== "undefined")
+    return new Promise(resolve => requestAnimationFrame(resolve));
+}
+
 export async function renderView(response: Response, element: Element) {
   const root = element as HTMLElement;
   const model = (await response.json()) as Model;
@@ -27,16 +34,16 @@ export async function renderView(response: Response, element: Element) {
       renderNav,
       renderMovieList,
       renderPagination,
-
       renderMovie,
       renderPerson,
       renderLists
   ]) {
     renderer(root, model);
+    await yieldScheduler();
   }
 }
 
-export function mount(root: HTMLElement, {h0, window}: {h0: H0Navigator, window: Window}) {
+export function mount(root: HTMLElement, {h0}: {h0: H0Navigator}) {
   // Scroll to top when navigating
   h0.addEventListener("navigate", () => root.querySelector("main")!.scrollTo(0, 0));
 }

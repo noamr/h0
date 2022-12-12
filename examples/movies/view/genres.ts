@@ -2,8 +2,9 @@ import { Genre } from "../types";
 import { reconcileChildren, templateView, arrayModel } from "../../../src/reconcile";
 export function renderGenreList(root: HTMLElement, containerSelector: string, genres: Genre[]) {
   reconcileChildren<Genre>({
-    model: arrayModel(genres, "id"),
+    model: arrayModel(genres, "id", {hashAttribute: "id"}),
     view: templateView({
+      hashAttribute: "id",
       container: root.querySelector(containerSelector)!,
       template: root.querySelector("template#genreLink")!,
       updateItem: (li: Element, value: Genre) => {
