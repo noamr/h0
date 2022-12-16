@@ -60,6 +60,7 @@ p {
 }
 .artwork {
   padding: 4rem;
+  -webkit-mask-image: linear-gradient(white 68%, transparent 100%);
 }
 
 @media only screen and (max-width: 1500px) {

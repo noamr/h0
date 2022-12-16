@@ -21,11 +21,32 @@ a.poster {
   align-items: center;
 }
 
+#movies {
+  position: relative;
+}
+
 ul:is(#movieList, .listMovies) a.poster:hover {
   transform: scale(1.03);
   background-color: var(--palette-background-paper);
   box-shadow: var(--box-shadow-1);
   text-decoration: none;
+}
+
+#notFound {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
+#notFound img {
+  max-width: 80vh;
+  width: 500px;
+}
+
+#movieList:has(:first-child) ~ #notFound {
+  display: none;
 }
 
 ul#movieList {

@@ -50,13 +50,11 @@
         </label>
       </header>
         <nav id="sideNav">
-          <a class="logo" href="/?categpry=popular&page=1">
+          <a href="/?categpry=popular&page=1">
             <img
-              class='logo-img'
-              width='150'
-              height='150'
-              src='/icons/logo.svg'
-              alt='movie ticket logo' />
+              id="logo"
+              src="/icons/logo.svg"
+              alt="movie ticket logo" />
           </a>
           <h3>Discover</h3>
           <ul id="categoryList">
@@ -66,7 +64,7 @@
           </ul>
           <h3>Genres</h3>
           <ul id="genreList"></ul>
-          <img class="tmdb-mark"
+          <img id="tmdb-mark"
             width="300"
             height="118"
             loading="lazy"
@@ -79,7 +77,7 @@
         <article id="movie">
           <h1>Title</h1>
           <h2>Tagline</h2>
-          <img class="artwork gradient"
+          <img class="artwork"
             width="780"
             alt="movie artwork"
             height="1170">
@@ -106,7 +104,7 @@
         <article id="person">
           <h1>Name</h1>
           <h2>Birthdate</h2>
-          <img class="artwork gradient"
+          <img class="artwork"
             width="780"
             alt="person profile"
             height="1170">
@@ -125,6 +123,10 @@
           <div class="pagination">
             <a href="#" id="prev" aria-label="Next"><h0-include src="icons/prev.svg"></h0-include></a>
             <a href="#" id="next" aria-label="Next"><h0-include src="icons/next.svg"></h0-include></a>
+          </div>
+          <div id="notFound">
+            <h3>No movies found</h3>
+            <img src="/icons/empty.svg">
           </div>
         </section>
         <section id="lists">
